@@ -1,8 +1,15 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
+import { Space_Grotesk, JetBrains_Mono, Syne } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
+
+const syne = Syne({ 
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
+})
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ['latin'],
@@ -38,7 +45,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FAFBFC',
+  themeColor: '#0A0A0A',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -51,7 +58,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+      <body className={`${syne.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased bg-deep-black text-pure-white`}>
+        <div className="noise-overlay" />
         {children}
         <Analytics />
       </body>

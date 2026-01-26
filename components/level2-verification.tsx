@@ -7,7 +7,6 @@ import {
   FileText,
   Check,
   X,
-  Upload,
   Shield,
   AlertCircle,
   Loader2,
@@ -53,7 +52,6 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
   const [aadharNumber, setAadharNumber] = useState("")
   const [panNumber, setPanNumber] = useState("")
   const [showAadhar, setShowAadhar] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
   const [cameraActive, setCameraActive] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
   
@@ -144,9 +142,7 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
 
   const processVerification = async () => {
     setStep("processing")
-    setIsProcessing(true)
 
-    // Simulate verification process
     await new Promise(resolve => setTimeout(resolve, 1500))
     setVerificationStatus(prev => ({ ...prev, photo: "verified" }))
     
@@ -157,7 +153,6 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
     setVerificationStatus(prev => ({ ...prev, pan: "verified" }))
     
     await new Promise(resolve => setTimeout(resolve, 1000))
-    setIsProcessing(false)
     setStep("complete")
   }
 
@@ -172,7 +167,7 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
   }
 
   const handleComplete = () => {
-    const bonusPoints = 150 // Level 2 verification bonus
+    const bonusPoints = 150
     onComplete(bonusPoints)
     handleClose()
   }
@@ -207,12 +202,12 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "verified":
-        return <Check className="w-4 h-4 text-white" />
+        return <Check className="w-4 h-4 text-void-black" />
       case "failed":
-        return <X className="w-4 h-4 text-white" />
+        return <X className="w-4 h-4 text-pure-white" />
       case "submitted":
       case "captured":
-        return <Loader2 className="w-4 h-4 text-white animate-spin" />
+        return <Loader2 className="w-4 h-4 text-void-black animate-spin" />
       default:
         return null
     }
@@ -223,29 +218,29 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
       case "verified":
         return "bg-neon-green"
       case "failed":
-        return "bg-coral-red"
+        return "bg-hot-pink"
       case "submitted":
       case "captured":
-        return "bg-warm-amber"
+        return "bg-neon-yellow"
       default:
-        return "bg-pearl-gray"
+        return "bg-charcoal"
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg bg-pure-white border-pearl-gray p-0 gap-0 rounded-2xl overflow-hidden">
+      <DialogContent className="sm:max-w-lg bg-carbon border-white/10 p-0 gap-0 rounded-2xl overflow-hidden">
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 border-b border-pearl-gray bg-gradient-to-r from-soft-cream to-pure-white">
+        <DialogHeader className="p-6 pb-4 border-b border-white/5 bg-gradient-to-r from-charcoal to-carbon">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-electric-violet to-aleo-teal flex items-center justify-center shadow-lg">
-              <Shield className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-electric-purple to-neon-cyan flex items-center justify-center">
+              <Shield className="w-6 h-6 text-void-black" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold text-abyss">
+              <DialogTitle className="text-xl font-bold text-pure-white">
                 Level 2 Verification
               </DialogTitle>
-              <p className="text-sm text-text-secondary mt-0.5">
+              <p className="text-sm text-light-gray mt-0.5">
                 Boost your score by +150 points
               </p>
             </div>
@@ -256,12 +251,12 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
           {/* Overview Step */}
           {step === "overview" && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-gradient-to-r from-electric-violet/10 to-aleo-teal/10 border border-electric-violet/20">
+              <div className="p-4 rounded-xl bg-electric-purple/10 border border-electric-purple/30">
                 <div className="flex items-start gap-3">
-                  <Lock className="w-5 h-5 text-electric-violet mt-0.5" />
+                  <Lock className="w-5 h-5 text-electric-purple mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-abyss">Privacy Protected</p>
-                    <p className="text-xs text-text-secondary mt-1">
+                    <p className="text-sm font-medium text-pure-white">Privacy Protected</p>
+                    <p className="text-xs text-light-gray mt-1">
                       Your documents are verified locally using zero-knowledge proofs. 
                       We never store your personal data.
                     </p>
@@ -273,27 +268,27 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                 {verificationItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-4 rounded-xl bg-soft-cream/50 border border-pearl-gray hover:border-aleo-teal/30 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl bg-charcoal border border-white/5 hover:border-neon-cyan/30 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center",
+                        "w-10 h-10 rounded-lg flex items-center justify-center",
                         item.status === "verified" 
                           ? "bg-neon-green/20" 
-                          : "bg-gradient-to-br from-aleo-teal/10 to-electric-violet/10"
+                          : "bg-neon-cyan/10"
                       )}>
                         <item.icon className={cn(
                           "w-5 h-5",
-                          item.status === "verified" ? "text-neon-green" : "text-aleo-teal"
+                          item.status === "verified" ? "text-neon-green" : "text-neon-cyan"
                         )} />
                       </div>
                       <div>
-                        <p className="font-medium text-abyss">{item.title}</p>
-                        <p className="text-xs text-text-secondary">{item.description}</p>
+                        <p className="font-medium text-pure-white">{item.title}</p>
+                        <p className="text-xs text-light-gray">{item.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-electric-violet bg-electric-violet/10 px-2 py-1 rounded-full">
+                      <span className="text-xs font-semibold text-electric-purple bg-electric-purple/10 px-2 py-1 rounded-full border border-electric-purple/30">
                         {item.bonus}
                       </span>
                       {item.status !== "pending" && (
@@ -314,7 +309,7 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                   setStep("photo")
                   startCamera()
                 }}
-                className="w-full h-12 bg-gradient-to-r from-aleo-teal to-electric-violet hover:from-aleo-teal/90 hover:to-electric-violet/90 text-white font-semibold rounded-xl mt-4"
+                className="w-full h-12 bg-gradient-to-r from-neon-cyan to-neon-green hover:opacity-90 text-void-black font-semibold rounded-lg mt-4 uppercase tracking-wide"
               >
                 Start Verification
                 <ChevronRight className="w-5 h-5 ml-2" />
@@ -326,21 +321,21 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
           {step === "photo" && (
             <div className="space-y-4">
               <div className="text-center mb-4">
-                <h3 className="font-semibold text-abyss">Take a Selfie</h3>
-                <p className="text-sm text-text-secondary">
+                <h3 className="font-semibold text-pure-white">Take a Selfie</h3>
+                <p className="text-sm text-light-gray">
                   Position your face in the frame
                 </p>
               </div>
 
-              <div className="relative aspect-[4/3] bg-deep-slate rounded-xl overflow-hidden">
+              <div className="relative aspect-[4/3] bg-void-black rounded-xl overflow-hidden">
                 {cameraError ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-4">
-                    <AlertCircle className="w-12 h-12 text-coral-red" />
-                    <p className="text-sm text-text-secondary">{cameraError}</p>
+                    <AlertCircle className="w-12 h-12 text-hot-pink" />
+                    <p className="text-sm text-light-gray">{cameraError}</p>
                     <Button
                       variant="outline"
                       onClick={startCamera}
-                      className="mt-2 bg-transparent"
+                      className="mt-2 bg-transparent border-white/20 text-pure-white hover:bg-charcoal"
                     >
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Try Again
@@ -363,13 +358,13 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                     />
                     {/* Face guide overlay */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="w-48 h-60 border-2 border-dashed border-white/50 rounded-full" />
+                      <div className="w-48 h-60 border-2 border-dashed border-neon-cyan/50 rounded-full" />
                     </div>
                     {/* Corner guides */}
-                    <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-aleo-teal rounded-tl-lg" />
-                    <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-aleo-teal rounded-tr-lg" />
-                    <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-aleo-teal rounded-bl-lg" />
-                    <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-aleo-teal rounded-br-lg" />
+                    <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-neon-cyan rounded-tl-lg" />
+                    <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-neon-cyan rounded-tr-lg" />
+                    <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-neon-cyan rounded-bl-lg" />
+                    <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-neon-cyan rounded-br-lg" />
                   </>
                 )}
                 <canvas ref={canvasRef} className="hidden" />
@@ -381,14 +376,14 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                     <Button
                       variant="outline"
                       onClick={retakePhoto}
-                      className="flex-1 h-12 border-pearl-gray text-abyss hover:bg-soft-cream bg-transparent rounded-xl"
+                      className="flex-1 h-12 border-white/20 text-pure-white hover:bg-charcoal bg-transparent rounded-lg"
                     >
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Retake
                     </Button>
                     <Button
                       onClick={() => setStep("aadhar")}
-                      className="flex-1 h-12 bg-gradient-to-r from-aleo-teal to-electric-violet text-white rounded-xl"
+                      className="flex-1 h-12 bg-gradient-to-r from-neon-cyan to-neon-green text-void-black rounded-lg"
                     >
                       Continue
                       <ChevronRight className="w-4 h-4 ml-2" />
@@ -398,7 +393,7 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                   <Button
                     onClick={capturePhoto}
                     disabled={!cameraActive}
-                    className="w-full h-12 bg-gradient-to-r from-aleo-teal to-electric-violet text-white rounded-xl"
+                    className="w-full h-12 bg-gradient-to-r from-neon-cyan to-neon-green text-void-black rounded-lg"
                   >
                     <Camera className="w-5 h-5 mr-2" />
                     Capture Photo
@@ -412,11 +407,11 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
           {step === "aadhar" && (
             <div className="space-y-4">
               <div className="text-center mb-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-aleo-teal/20 to-electric-violet/20 flex items-center justify-center mx-auto mb-3">
-                  <CreditCard className="w-7 h-7 text-aleo-teal" />
+                <div className="w-14 h-14 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 flex items-center justify-center mx-auto mb-3">
+                  <CreditCard className="w-7 h-7 text-neon-cyan" />
                 </div>
-                <h3 className="font-semibold text-abyss">Aadhar Verification</h3>
-                <p className="text-sm text-text-secondary">
+                <h3 className="font-semibold text-pure-white">Aadhar Verification</h3>
+                <p className="text-sm text-light-gray">
                   Enter your 12-digit Aadhar number
                 </p>
               </div>
@@ -428,29 +423,29 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                     value={aadharNumber}
                     onChange={(e) => setAadharNumber(formatAadhar(e.target.value))}
                     placeholder="XXXX XXXX XXXX"
-                    className="h-14 text-lg font-mono text-center bg-soft-cream border-pearl-gray rounded-xl focus:border-aleo-teal focus:ring-aleo-teal/20 pr-12"
+                    className="h-14 text-lg font-mono text-center bg-charcoal border-white/10 rounded-lg focus:border-neon-cyan focus:ring-neon-cyan/20 pr-12 text-pure-white placeholder:text-text-muted"
                     maxLength={14}
                   />
                   <button
                     type="button"
                     onClick={() => setShowAadhar(!showAadhar)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-abyss"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-light-gray hover:text-pure-white"
                   >
                     {showAadhar ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 
                 {aadharNumber && !validateAadhar(aadharNumber) && (
-                  <p className="text-xs text-coral-red flex items-center gap-1">
+                  <p className="text-xs text-hot-pink flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     Please enter a valid 12-digit Aadhar number
                   </p>
                 )}
               </div>
 
-              <div className="p-3 rounded-lg bg-soft-cream/50 border border-pearl-gray">
-                <p className="text-xs text-text-secondary flex items-start gap-2">
-                  <Lock className="w-4 h-4 text-aleo-teal flex-shrink-0 mt-0.5" />
+              <div className="p-3 rounded-lg bg-charcoal border border-white/5">
+                <p className="text-xs text-light-gray flex items-start gap-2">
+                  <Lock className="w-4 h-4 text-neon-cyan flex-shrink-0 mt-0.5" />
                   Your Aadhar number is hashed locally using SHA-256. Only the hash is used for verification.
                 </p>
               </div>
@@ -459,14 +454,14 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                 <Button
                   variant="outline"
                   onClick={() => setStep("photo")}
-                  className="flex-1 h-12 border-pearl-gray text-abyss hover:bg-soft-cream bg-transparent rounded-xl"
+                  className="flex-1 h-12 border-white/20 text-pure-white hover:bg-charcoal bg-transparent rounded-lg"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleAadharSubmit}
                   disabled={!validateAadhar(aadharNumber)}
-                  className="flex-1 h-12 bg-gradient-to-r from-aleo-teal to-electric-violet text-white rounded-xl disabled:opacity-50"
+                  className="flex-1 h-12 bg-gradient-to-r from-neon-cyan to-neon-green text-void-black rounded-lg disabled:opacity-50"
                 >
                   Continue
                   <ChevronRight className="w-4 h-4 ml-2" />
@@ -479,11 +474,11 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
           {step === "pan" && (
             <div className="space-y-4">
               <div className="text-center mb-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-aleo-teal/20 to-electric-violet/20 flex items-center justify-center mx-auto mb-3">
-                  <FileText className="w-7 h-7 text-electric-violet" />
+                <div className="w-14 h-14 rounded-xl bg-electric-purple/10 border border-electric-purple/30 flex items-center justify-center mx-auto mb-3">
+                  <FileText className="w-7 h-7 text-electric-purple" />
                 </div>
-                <h3 className="font-semibold text-abyss">PAN Verification</h3>
-                <p className="text-sm text-text-secondary">
+                <h3 className="font-semibold text-pure-white">PAN Verification</h3>
+                <p className="text-sm text-light-gray">
                   Enter your 10-character PAN number
                 </p>
               </div>
@@ -494,21 +489,21 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                   value={panNumber}
                   onChange={(e) => setPanNumber(formatPAN(e.target.value))}
                   placeholder="ABCDE1234F"
-                  className="h-14 text-lg font-mono text-center bg-soft-cream border-pearl-gray rounded-xl focus:border-aleo-teal focus:ring-aleo-teal/20 uppercase"
+                  className="h-14 text-lg font-mono text-center bg-charcoal border-white/10 rounded-lg focus:border-electric-purple focus:ring-electric-purple/20 uppercase text-pure-white placeholder:text-text-muted"
                   maxLength={10}
                 />
                 
                 {panNumber && !validatePAN(panNumber) && panNumber.length === 10 && (
-                  <p className="text-xs text-coral-red flex items-center gap-1">
+                  <p className="text-xs text-hot-pink flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     Invalid PAN format. Expected: AAAAA0000A
                   </p>
                 )}
               </div>
 
-              <div className="p-3 rounded-lg bg-soft-cream/50 border border-pearl-gray">
-                <p className="text-xs text-text-secondary flex items-start gap-2">
-                  <Lock className="w-4 h-4 text-electric-violet flex-shrink-0 mt-0.5" />
+              <div className="p-3 rounded-lg bg-charcoal border border-white/5">
+                <p className="text-xs text-light-gray flex items-start gap-2">
+                  <Lock className="w-4 h-4 text-electric-purple flex-shrink-0 mt-0.5" />
                   Your PAN is verified using zero-knowledge proofs without revealing the actual number.
                 </p>
               </div>
@@ -517,14 +512,14 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                 <Button
                   variant="outline"
                   onClick={() => setStep("aadhar")}
-                  className="flex-1 h-12 border-pearl-gray text-abyss hover:bg-soft-cream bg-transparent rounded-xl"
+                  className="flex-1 h-12 border-white/20 text-pure-white hover:bg-charcoal bg-transparent rounded-lg"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handlePanSubmit}
                   disabled={!validatePAN(panNumber)}
-                  className="flex-1 h-12 bg-gradient-to-r from-aleo-teal to-electric-violet text-white rounded-xl disabled:opacity-50"
+                  className="flex-1 h-12 bg-gradient-to-r from-neon-cyan to-neon-green text-void-black rounded-lg disabled:opacity-50"
                 >
                   Verify All
                   <Shield className="w-4 h-4 ml-2" />
@@ -537,11 +532,11 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
           {step === "processing" && (
             <div className="py-8 space-y-6">
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-aleo-teal to-electric-violet flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <Shield className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neon-cyan to-electric-purple flex items-center justify-center mx-auto mb-4 animate-pulse-neon">
+                  <Shield className="w-8 h-8 text-void-black" />
                 </div>
-                <h3 className="font-semibold text-abyss">Verifying Your Identity</h3>
-                <p className="text-sm text-text-secondary mt-1">
+                <h3 className="font-semibold text-pure-white">Verifying Your Identity</h3>
+                <p className="text-sm text-light-gray mt-1">
                   Processing with zero-knowledge proofs...
                 </p>
               </div>
@@ -554,7 +549,7 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                       "flex items-center justify-between p-4 rounded-xl border transition-all duration-500",
                       item.status === "verified"
                         ? "bg-neon-green/10 border-neon-green/30"
-                        : "bg-soft-cream/50 border-pearl-gray"
+                        : "bg-charcoal border-white/5"
                     )}
                     style={{ animationDelay: `${index * 200}ms` }}
                   >
@@ -564,16 +559,16 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
                         getStatusColor(item.status)
                       )}>
                         {item.status === "verified" ? (
-                          <Check className="w-4 h-4 text-white" />
+                          <Check className="w-4 h-4 text-void-black" />
                         ) : (
-                          <Loader2 className="w-4 h-4 text-white animate-spin" />
+                          <Loader2 className="w-4 h-4 text-void-black animate-spin" />
                         )}
                       </div>
-                      <span className="font-medium text-abyss">{item.title}</span>
+                      <span className="font-medium text-pure-white">{item.title}</span>
                     </div>
                     <span className={cn(
                       "text-sm font-medium",
-                      item.status === "verified" ? "text-neon-green" : "text-text-secondary"
+                      item.status === "verified" ? "text-neon-green" : "text-light-gray"
                     )}>
                       {item.status === "verified" ? "Verified" : "Verifying..."}
                     </span>
@@ -587,31 +582,31 @@ export function Level2Verification({ open, onClose, onComplete }: Level2Verifica
           {step === "complete" && (
             <div className="py-8 text-center space-y-6">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-neon-green to-aleo-teal flex items-center justify-center mx-auto shadow-lg">
-                  <Check className="w-10 h-10 text-white" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-neon-green to-neon-cyan flex items-center justify-center mx-auto glow-box-green">
+                  <Check className="w-10 h-10 text-void-black" />
                 </div>
                 <div className="absolute -top-2 -right-2 left-0 right-0 mx-auto w-fit">
-                  <Sparkles className="w-6 h-6 text-warm-amber animate-pulse" />
+                  <Sparkles className="w-6 h-6 text-neon-yellow animate-pulse" />
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-abyss">Verification Complete!</h3>
-                <p className="text-text-secondary mt-2">
+                <h3 className="text-xl font-bold text-pure-white">Verification Complete!</h3>
+                <p className="text-light-gray mt-2">
                   You have successfully completed Level 2 verification
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-gradient-to-r from-electric-violet/10 to-aleo-teal/10 border border-electric-violet/20">
+              <div className="p-4 rounded-xl bg-neon-green/10 border border-neon-green/30">
                 <div className="flex items-center justify-center gap-3">
-                  <span className="text-sm text-text-secondary">Bonus Points Earned:</span>
-                  <span className="text-2xl font-bold gradient-text">+150</span>
+                  <span className="text-sm text-light-gray">Bonus Points Earned:</span>
+                  <span className="text-2xl font-bold gradient-text-static">+150</span>
                 </div>
               </div>
 
               <Button
                 onClick={handleComplete}
-                className="w-full h-12 bg-gradient-to-r from-aleo-teal to-electric-violet text-white font-semibold rounded-xl"
+                className="w-full h-12 bg-gradient-to-r from-neon-cyan to-neon-green text-void-black font-semibold rounded-lg uppercase tracking-wide"
               >
                 <Sparkles className="w-5 h-5 mr-2" />
                 Claim Bonus & Continue

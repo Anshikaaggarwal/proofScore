@@ -34,7 +34,7 @@ export default function Home() {
 
   if (showDashboard) {
     return (
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-deep-black">
         <Navbar
           isConnected={isConnected}
           address={address}
@@ -50,7 +50,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-deep-black">
       <Navbar
         isConnected={isConnected}
         address={address}
@@ -62,26 +62,26 @@ export default function Home() {
       <StatsSection />
       
       {/* Final CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-pure-white via-soft-cream/50 to-pure-white" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-aleo-teal/5 rounded-full blur-3xl" />
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-deep-black">
+        {/* Background elements */}
+        <div className="gradient-blur gradient-blur-cyan absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+        <div className="absolute inset-0 grid-pattern opacity-30" />
         
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full badge-primary mb-6">
-            <span className="text-sm font-medium text-deep-slate">Get Started Today</span>
+          <div className="badge-neon mb-6 inline-flex">
+            <span>Get Started Today</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-abyss mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-pure-white mb-6">
             Ready to prove your{" "}
-            <span className="gradient-text">creditworthiness</span>?
+            <span className="gradient-text-static">creditworthiness</span>?
           </h2>
-          <p className="text-lg text-text-secondary mb-8 max-w-xl mx-auto">
+          <p className="text-lg text-light-gray mb-8 max-w-xl mx-auto">
             Join thousands of users who have already generated their on-chain credit scores
             with complete privacy protection.
           </p>
           <button
             onClick={handleLaunchApp}
-            className="group inline-flex items-center gap-2 h-14 px-8 text-lg font-semibold bg-gradient-to-r from-aleo-teal to-electric-violet hover:from-aleo-teal/90 hover:to-electric-violet/90 text-white rounded-xl transition-all duration-300 btn-glow"
+            className="group inline-flex items-center gap-2 h-14 px-10 text-base font-semibold bg-gradient-to-r from-neon-cyan to-neon-green hover:opacity-90 text-void-black rounded-lg transition-all duration-300 uppercase tracking-wide"
           >
             Connect Wallet & Start
             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />

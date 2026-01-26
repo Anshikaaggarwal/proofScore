@@ -29,10 +29,10 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
                 {/* Step circle */}
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
-                    isCompleted && "bg-neon-green text-white",
-                    isCurrent && "bg-aleo-teal text-white",
-                    isPending && "bg-soft-cream border-2 border-pearl-gray text-text-muted"
+                    "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 border",
+                    isCompleted && "bg-neon-green text-void-black border-neon-green",
+                    isCurrent && "bg-neon-cyan text-void-black border-neon-cyan",
+                    isPending && "bg-charcoal border-white/10 text-text-muted"
                   )}
                 >
                   {isCompleted ? (
@@ -40,7 +40,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
                   ) : isCurrent ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    <span className="text-sm font-semibold">{index + 1}</span>
+                    <span className="text-sm font-semibold font-mono">{String(index + 1).padStart(2, '0')}</span>
                   )}
                 </div>
 
@@ -49,7 +49,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
                   className={cn(
                     "mt-2 text-xs sm:text-sm font-medium text-center transition-colors duration-300",
                     isCompleted && "text-neon-green",
-                    isCurrent && "text-aleo-teal",
+                    isCurrent && "text-neon-cyan",
                     isPending && "text-text-muted"
                   )}
                 >
@@ -58,7 +58,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
 
                 {/* Step description */}
                 {step.description && isCurrent && (
-                  <span className="mt-1 text-xs text-text-muted text-center max-w-[100px] animate-slide-up">
+                  <span className="mt-1 text-xs text-light-gray text-center max-w-[100px] animate-slide-up">
                     {step.description}
                   </span>
                 )}
@@ -70,7 +70,7 @@ export function StepIndicator({ steps, currentStep, className }: StepIndicatorPr
                   <div
                     className={cn(
                       "h-full transition-all duration-500 rounded-full",
-                      isCompleted ? "bg-neon-green" : "bg-pearl-gray"
+                      isCompleted ? "bg-neon-green" : "bg-charcoal"
                     )}
                   />
                 </div>

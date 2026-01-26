@@ -6,7 +6,7 @@ import { AleoLogo } from "./aleo-logo"
 
 const footerLinks = {
   product: [
-    { label: "Dashboard", href: "/dashboard" },
+    { label: "Dashboard", href: "/" },
     { label: "Documentation", href: "#docs" },
     { label: "API Reference", href: "#api" },
     { label: "Changelog", href: "#changelog" },
@@ -38,36 +38,16 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-abyss text-white">
+    <footer className="bg-void-black border-t border-white/5">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Main Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-aleo-teal to-electric-violet flex items-center justify-center">
-                <svg
-                  viewBox="0 0 32 32"
-                  className="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <path
-                    d="M16 6 L24 12 L24 20 L16 26 L8 20 L8 12 Z"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M16 11 L20 16 L16 21 L12 16 Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
-              <span className="font-semibold text-lg">
-                aleo<span className="text-aleo-teal">credit</span>
-              </span>
+              <AleoLogo size="sm" variant="full" />
             </Link>
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
+            <p className="text-sm text-light-gray mb-4 leading-relaxed">
               The first credit SDK on Aleo. Privacy-preserving credit scoring powered by zero-knowledge proofs.
             </p>
             {/* Social Links */}
@@ -78,7 +58,7 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-xl bg-deep-slate/50 flex items-center justify-center text-slate-400 hover:text-aleo-teal hover:bg-aleo-teal/10 transition-all duration-200"
+                  className="w-10 h-10 rounded-lg bg-charcoal flex items-center justify-center text-light-gray hover:text-neon-cyan hover:bg-neon-cyan/10 transition-all duration-200 border border-white/5 hover:border-neon-cyan/30"
                   aria-label={social.label}
                 >
                   <social.icon className="w-4 h-4" />
@@ -89,7 +69,7 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider mb-4 text-slate-300">
+            <h4 className="text-xs font-semibold uppercase tracking-widest mb-4 text-text-muted">
               Product
             </h4>
             <ul className="space-y-3">
@@ -97,7 +77,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
+                    className="text-sm text-light-gray hover:text-neon-cyan transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -107,7 +87,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider mb-4 text-slate-300">
+            <h4 className="text-xs font-semibold uppercase tracking-widest mb-4 text-text-muted">
               Developers
             </h4>
             <ul className="space-y-3">
@@ -115,7 +95,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
+                    className="text-sm text-light-gray hover:text-neon-cyan transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -125,7 +105,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider mb-4 text-slate-300">
+            <h4 className="text-xs font-semibold uppercase tracking-widest mb-4 text-text-muted">
               Resources
             </h4>
             <ul className="space-y-3">
@@ -133,7 +113,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
+                    className="text-sm text-light-gray hover:text-neon-cyan transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -143,7 +123,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider mb-4 text-slate-300">
+            <h4 className="text-xs font-semibold uppercase tracking-widest mb-4 text-text-muted">
               Legal
             </h4>
             <ul className="space-y-3">
@@ -151,7 +131,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
+                    className="text-sm text-light-gray hover:text-neon-cyan transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -162,8 +142,8 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-deep-slate flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500">
+        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-text-muted">
             {new Date().getFullYear()} Aleo Credit. All rights reserved.
           </p>
           <div className="flex items-center gap-2">
@@ -171,7 +151,7 @@ export function Footer() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-green" />
             </span>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-light-gray">
               All systems operational
             </p>
           </div>

@@ -69,21 +69,21 @@ export function BonusBreakdown({
     <div ref={containerRef} className={cn("space-y-6", className)}>
       {/* Visual Bar Chart */}
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider">
+        <h4 className="text-xs font-semibold text-text-muted uppercase tracking-widest">
           Score Composition
         </h4>
         
         {/* Stacked bar */}
-        <div className="relative h-10 bg-soft-cream rounded-xl overflow-hidden">
+        <div className="relative h-10 bg-charcoal rounded-lg overflow-hidden border border-white/5">
           <div className="absolute inset-0 flex">
             {/* Base score */}
             <div
-              className="h-full bg-slate-200 transition-all duration-700 ease-out flex items-center justify-center"
+              className="h-full bg-medium-gray transition-all duration-700 ease-out flex items-center justify-center"
               style={{
                 width: isVisible ? `${(baseScore / maxWidth) * 100}%` : "0%",
               }}
             >
-              <span className="text-xs font-mono text-text-secondary truncate px-2">
+              <span className="text-xs font-mono text-light-gray truncate px-2">
                 {baseScore}
               </span>
             </div>
@@ -100,7 +100,7 @@ export function BonusBreakdown({
                 }}
               >
                 {bonus.value > 30 && (
-                  <span className="text-xs font-mono text-white truncate px-1">
+                  <span className="text-xs font-mono text-void-black truncate px-1 font-semibold">
                     +{bonus.value}
                   </span>
                 )}
@@ -112,8 +112,8 @@ export function BonusBreakdown({
         {/* Legend */}
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-slate-200" />
-            <span className="text-xs text-text-secondary">Base ({baseScore})</span>
+            <div className="w-3 h-3 rounded bg-medium-gray" />
+            <span className="text-xs text-light-gray">Base ({baseScore})</span>
           </div>
           {bonuses.map((bonus) => (
             <div key={bonus.label} className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export function BonusBreakdown({
                 className="w-3 h-3 rounded"
                 style={{ backgroundColor: bonus.color }}
               />
-              <span className="text-xs text-text-secondary">
+              <span className="text-xs text-light-gray">
                 {bonus.label} (+{bonus.value})
               </span>
             </div>
@@ -131,10 +131,10 @@ export function BonusBreakdown({
 
       {/* Formula Display */}
       {showFormula && (
-        <div className="premium-card p-4 font-mono text-sm space-y-2">
+        <div className="card-dark p-4 font-mono text-sm space-y-2">
           <div className="flex justify-between">
-            <span className="text-text-secondary">baseScore</span>
-            <span className="text-abyss">{baseScore}</span>
+            <span className="text-light-gray">baseScore</span>
+            <span className="text-pure-white">{baseScore}</span>
           </div>
           {bonuses.map((bonus, index) => (
             <div
@@ -145,20 +145,20 @@ export function BonusBreakdown({
               )}
               style={{ transitionDelay: `${(index + 1) * 200}ms` }}
             >
-              <span className="text-text-secondary">{bonus.label.toLowerCase().replace(/\s/g, "")}Bonus</span>
+              <span className="text-light-gray">{bonus.label.toLowerCase().replace(/\s/g, "")}Bonus</span>
               <span style={{ color: bonus.color }}>+{animatedBonuses[index]}</span>
             </div>
           ))}
-          <div className="border-t border-pearl-gray pt-2 mt-2">
+          <div className="border-t border-white/10 pt-2 mt-2">
             <div className="flex justify-between">
-              <span className="text-text-secondary">totalBonus</span>
-              <span className="text-aleo-teal">
+              <span className="text-light-gray">totalBonus</span>
+              <span className="text-neon-cyan">
                 {animatedBonuses.reduce((sum, v) => sum + v, 0)}
               </span>
             </div>
           </div>
-          <div className="border-t border-pearl-gray pt-2 flex justify-between font-bold">
-            <span className="text-abyss">finalScore</span>
+          <div className="border-t border-white/10 pt-2 flex justify-between font-bold">
+            <span className="text-pure-white">finalScore</span>
             <span className="text-neon-green">{baseScore + animatedBonuses.reduce((sum, v) => sum + v, 0)}</span>
           </div>
         </div>
