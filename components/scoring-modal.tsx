@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { X, ArrowRight, Check, Loader2 } from "lucide-react"
+import { X, ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { StepIndicator } from "@/components/step-indicator"
 import { ScoreRing } from "@/components/score-ring"
@@ -48,11 +48,11 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
   const finalScore = BASE_SCORE + totalBonus
 
   const bonusItems = [
-    { label: "TX Bonus", value: bonuses.txBonus, color: "#0EA5E9", description: `${metrics.transactions} transactions` },
-    { label: "Age Bonus", value: bonuses.ageBonus, color: "#8B5CF6", description: `${metrics.walletAge} months old` },
-    { label: "DeFi Bonus", value: bonuses.defiBonus, color: "#3B82F6", description: `DeFi score: ${metrics.defiScore}` },
-    { label: "Repay Bonus", value: bonuses.repayBonus, color: "#10B981", description: `${metrics.repaymentRate}% rate` },
-    ...(bonusPoints > 0 ? [{ label: "KYC Bonus", value: bonusPoints, color: "#F59E0B", description: "Level 2 verified" }] : []),
+    { label: "TX Bonus", value: bonuses.txBonus, color: "#00F0FF", description: `${metrics.transactions} transactions` },
+    { label: "Age Bonus", value: bonuses.ageBonus, color: "#A855F7", description: `${metrics.walletAge} months old` },
+    { label: "DeFi Bonus", value: bonuses.defiBonus, color: "#0066FF", description: `DeFi score: ${metrics.defiScore}` },
+    { label: "Repay Bonus", value: bonuses.repayBonus, color: "#00FF88", description: `${metrics.repaymentRate}% rate` },
+    ...(bonusPoints > 0 ? [{ label: "KYC Bonus", value: bonusPoints, color: "#FAFF00", description: "Level 2 verified" }] : []),
   ]
 
   const steps = [
@@ -70,7 +70,6 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
     }
   }
 
-  // Reset and start flow when modal opens
   useEffect(() => {
     if (open) {
       setStep("fetching")
@@ -78,7 +77,6 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
     }
   }, [open])
 
-  // Auto-advance through steps
   useEffect(() => {
     if (!open) return
 
@@ -118,16 +116,16 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-abyss/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-void-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-pure-white border border-pearl-gray rounded-2xl shadow-xl animate-scale-in">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-carbon border border-white/10 rounded-2xl shadow-xl animate-scale-in">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-text-muted hover:text-abyss transition-colors z-10 hover:bg-soft-cream rounded-lg"
+          className="absolute top-4 right-4 p-2 text-light-gray hover:text-pure-white transition-colors z-10 hover:bg-charcoal rounded-lg"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -143,13 +141,13 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
           {step === "fetching" && (
             <div className="space-y-6 animate-slide-up">
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-aleo-teal/10 flex items-center justify-center mb-4">
-                  <Loader2 className="w-8 h-8 text-aleo-teal animate-spin" />
+                <div className="w-16 h-16 mx-auto rounded-xl bg-neon-cyan/10 flex items-center justify-center mb-4 border border-neon-cyan/30">
+                  <Loader2 className="w-8 h-8 text-neon-cyan animate-spin" />
                 </div>
-                <h3 className="text-xl font-semibold text-abyss mb-2">
+                <h3 className="text-xl font-semibold text-pure-white mb-2">
                   Fetching Wallet Metrics
                 </h3>
-                <p className="text-text-secondary">
+                <p className="text-light-gray">
                   Analyzing your on-chain activity...
                 </p>
               </div>
@@ -159,10 +157,10 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
                 {["Transaction count", "Wallet age", "DeFi score", "Repayment rate", "Token balance"].map((label, i) => (
                   <div
                     key={label}
-                    className="flex items-center justify-between p-4 rounded-xl bg-soft-cream"
+                    className="flex items-center justify-between p-4 rounded-xl bg-charcoal border border-white/5"
                     style={{ animationDelay: `${i * 100}ms` }}
                   >
-                    <span className="text-sm text-text-secondary">{label}</span>
+                    <span className="text-sm text-light-gray">{label}</span>
                     <div className="skeleton w-20 h-6" />
                   </div>
                 ))}
@@ -174,10 +172,10 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
           {step === "calculating" && (
             <div className="space-y-6 animate-slide-up">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-abyss mb-2">
+                <h3 className="text-xl font-semibold text-pure-white mb-2">
                   Calculating Your Score
                 </h3>
-                <p className="text-text-secondary">
+                <p className="text-light-gray">
                   Applying bonus calculations...
                 </p>
               </div>
@@ -195,10 +193,10 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
           {step === "complete" && (
             <div className="space-y-8 animate-slide-up">
               <div className="text-center">
-                <h3 className="text-xl font-semibold text-abyss mb-2">
+                <h3 className="text-xl font-semibold text-pure-white mb-2">
                   Score Calculation Complete
                 </h3>
-                <p className="text-text-secondary">
+                <p className="text-light-gray">
                   Your credit score has been calculated
                 </p>
               </div>
@@ -210,17 +208,17 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
 
               {/* Score Breakdown Grid */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="premium-card p-4 text-center">
-                  <div className="text-2xl font-bold font-mono text-text-muted mb-1">
+                <div className="card-dark p-4 text-center">
+                  <div className="text-2xl font-bold font-mono text-light-gray mb-1">
                     {BASE_SCORE}
                   </div>
-                  <div className="text-xs text-text-secondary">Base Score</div>
+                  <div className="text-xs text-text-muted uppercase tracking-widest">Base Score</div>
                 </div>
-                <div className="premium-card p-4 text-center">
-                  <div className="text-2xl font-bold font-mono text-aleo-teal mb-1">
+                <div className="card-dark p-4 text-center">
+                  <div className="text-2xl font-bold font-mono text-neon-cyan mb-1">
                     +{totalBonus}
                   </div>
-                  <div className="text-xs text-text-secondary">Total Bonus</div>
+                  <div className="text-xs text-text-muted uppercase tracking-widest">Total Bonus</div>
                 </div>
               </div>
 
@@ -229,7 +227,7 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
                 {bonusItems.map((bonus) => (
                   <div
                     key={bonus.label}
-                    className="p-3 rounded-xl bg-soft-cream text-center"
+                    className="p-3 rounded-lg bg-charcoal border border-white/5 text-center"
                   >
                     <div
                       className="text-lg font-bold font-mono mb-1"
@@ -237,7 +235,7 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
                     >
                       +{bonus.value}
                     </div>
-                    <div className="text-xs text-text-secondary">{bonus.label}</div>
+                    <div className="text-xs text-text-muted">{bonus.label}</div>
                   </div>
                 ))}
               </div>
@@ -246,7 +244,7 @@ export function ScoringModal({ open, onClose, metrics, bonusPoints = 0 }: Scorin
               <Button
                 size="lg"
                 onClick={handleGenerateProof}
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-aleo-teal to-electric-violet hover:from-aleo-teal/90 hover:to-electric-violet/90 text-white rounded-xl transition-all duration-300 btn-glow"
+                className="w-full h-14 text-base font-semibold bg-gradient-to-r from-neon-cyan to-neon-green hover:opacity-90 text-void-black rounded-lg transition-all duration-300 uppercase tracking-wide"
               >
                 Generate Zero-Knowledge Proof
                 <ArrowRight className="ml-2 w-5 h-5" />

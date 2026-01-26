@@ -20,7 +20,7 @@ export function MetricCard({
   value,
   suffix = "",
   icon: Icon,
-  iconColor = "text-aleo-teal",
+  iconColor = "text-neon-cyan",
   delay = 0,
   isPercentage = false,
   description,
@@ -75,11 +75,13 @@ export function MetricCard({
 
   const getBgColor = (color: string) => {
     switch (color) {
-      case "text-aleo-teal": return "bg-aleo-teal/10"
-      case "text-electric-violet": return "bg-electric-violet/10"
-      case "text-warm-amber": return "bg-warm-amber/10"
+      case "text-neon-cyan": return "bg-neon-cyan/10"
+      case "text-electric-purple": return "bg-electric-purple/10"
+      case "text-neon-yellow": return "bg-neon-yellow/10"
       case "text-neon-green": return "bg-neon-green/10"
-      default: return "bg-aleo-teal/10"
+      case "text-neon-blue": return "bg-neon-blue/10"
+      case "text-hot-pink": return "bg-hot-pink/10"
+      default: return "bg-neon-cyan/10"
     }
   }
 
@@ -87,7 +89,7 @@ export function MetricCard({
     <div
       ref={cardRef}
       className={cn(
-        "premium-card p-6 group cursor-default",
+        "card-dark p-6 group cursor-default",
         "opacity-0",
         isVisible && "animate-slide-up"
       )}
@@ -95,18 +97,18 @@ export function MetricCard({
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm text-text-muted font-medium uppercase tracking-wider mb-2">
+          <p className="text-xs text-text-muted font-medium uppercase tracking-widest mb-2">
             {label}
           </p>
           <div className="flex items-baseline gap-1">
-            <span className="text-4xl md:text-5xl font-bold font-mono text-abyss tabular-nums">
+            <span className="text-4xl md:text-5xl font-bold font-mono text-pure-white tabular-nums number-counter">
               {displayValue.toLocaleString()}
             </span>
             {suffix && (
-              <span className="text-xl text-text-secondary font-mono">{suffix}</span>
+              <span className="text-xl text-light-gray font-mono">{suffix}</span>
             )}
             {isPercentage && (
-              <span className="text-xl text-text-secondary font-mono">%</span>
+              <span className="text-xl text-light-gray font-mono">%</span>
             )}
           </div>
           {description && (
@@ -117,7 +119,7 @@ export function MetricCard({
         </div>
         <div
           className={cn(
-            "p-3 rounded-xl transition-all duration-200",
+            "p-3 rounded-lg transition-all duration-200 border border-white/5",
             getBgColor(iconColor),
             "group-hover:scale-110"
           )}
@@ -126,8 +128,8 @@ export function MetricCard({
         </div>
       </div>
       
-      {/* Subtle progress indicator */}
-      <div className="mt-4 h-1.5 bg-soft-cream rounded-full overflow-hidden">
+      {/* Progress bar */}
+      <div className="mt-4 h-1 bg-charcoal rounded-full overflow-hidden">
         <div
           className={cn(
             "h-full rounded-full transition-all duration-1000 ease-out",

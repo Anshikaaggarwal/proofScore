@@ -75,11 +75,12 @@ export function StatsSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-pure-white via-soft-cream/50 to-pure-white relative overflow-hidden"
+      className="py-24 px-4 sm:px-6 lg:px-8 bg-carbon relative overflow-hidden"
     >
       {/* Background Elements */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-aleo-teal/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-electric-violet/5 rounded-full blur-3xl" />
+      <div className="gradient-blur gradient-blur-cyan absolute top-0 left-1/4 opacity-10" />
+      <div className="gradient-blur gradient-blur-purple absolute bottom-0 right-1/4 opacity-10" />
+      <div className="absolute inset-0 grid-pattern opacity-30" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Stats Grid */}
@@ -88,40 +89,40 @@ export function StatsSection() {
             <div
               key={stat.label}
               className={cn(
-                "text-center p-6 premium-card transition-all duration-700",
+                "text-center p-6 card-dark transition-all duration-700",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold font-mono mb-2">
-                <span className="text-abyss">{stat.prefix}</span>
-                <span className="gradient-text">{animatedValues[index].toLocaleString()}</span>
-                <span className="text-aleo-teal">{stat.suffix}</span>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold font-mono mb-2 number-counter">
+                <span className="text-light-gray">{stat.prefix}</span>
+                <span className="gradient-text-static">{animatedValues[index].toLocaleString()}</span>
+                <span className="text-neon-cyan">{stat.suffix}</span>
               </div>
-              <div className="text-sm text-text-secondary font-medium">{stat.label}</div>
+              <div className="text-xs text-text-muted font-medium uppercase tracking-widest">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Partners */}
         <div className="text-center">
-          <p className="text-sm text-text-muted uppercase tracking-wider mb-8 font-medium">
+          <p className="text-xs text-text-muted uppercase tracking-widest mb-8 font-medium">
             Trusted by leading protocols
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
             {partners.map((partner, index) => (
               <div
                 key={partner.name}
                 className={cn(
-                  "flex items-center gap-3 px-5 py-3 rounded-xl bg-pure-white border border-pearl-gray hover:border-aleo-teal/30 hover:shadow-md transition-all duration-300 cursor-default",
+                  "flex items-center gap-3 px-5 py-3 rounded-lg bg-charcoal border border-white/5 hover:border-neon-cyan/30 transition-all duration-300 cursor-default",
                   isVisible ? "opacity-100" : "opacity-0"
                 )}
                 style={{ transitionDelay: `${600 + index * 100}ms` }}
               >
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-aleo-teal/10 to-electric-violet/10 flex items-center justify-center">
-                  <span className="text-sm font-bold gradient-text">{partner.logo}</span>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan/20 to-neon-green/20 flex items-center justify-center">
+                  <span className="text-sm font-bold gradient-text-static">{partner.logo}</span>
                 </div>
-                <span className="text-sm font-semibold text-abyss">{partner.name}</span>
+                <span className="text-sm font-semibold text-pure-white">{partner.name}</span>
               </div>
             ))}
           </div>

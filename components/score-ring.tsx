@@ -37,17 +37,17 @@ export function ScoreRing({
   // Get color based on score
   const getScoreColor = (s: number) => {
     const pct = ((s - minScore) / (maxScore - minScore)) * 100
-    if (pct < 33) return "#EF4444" // coral-red
-    if (pct < 66) return "#F59E0B" // warm-amber
-    return "#10B981" // neon-green
+    if (pct < 33) return "#FF0080" // hot-pink
+    if (pct < 66) return "#FAFF00" // neon-yellow
+    return "#00FF88" // neon-green
   }
 
   // Get risk level
   const getRiskLevel = (s: number) => {
     const pct = ((s - minScore) / (maxScore - minScore)) * 100
-    if (pct < 33) return { label: "High Risk", color: "text-coral-red bg-coral-red/10 border-coral-red/20" }
-    if (pct < 66) return { label: "Medium Risk", color: "text-warm-amber bg-warm-amber/10 border-warm-amber/20" }
-    return { label: "Low Risk", color: "text-neon-green bg-neon-green/10 border-neon-green/20" }
+    if (pct < 33) return { label: "High Risk", color: "text-hot-pink bg-hot-pink/10 border-hot-pink/30" }
+    if (pct < 66) return { label: "Medium Risk", color: "text-neon-yellow bg-neon-yellow/10 border-neon-yellow/30" }
+    return { label: "Low Risk", color: "text-neon-green bg-neon-green/10 border-neon-green/30" }
   }
 
   useEffect(() => {
@@ -103,10 +103,10 @@ export function ScoreRing({
           height={size}
         >
           <defs>
-            <linearGradient id="scoreGradientLight" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#EF4444" />
-              <stop offset="50%" stopColor="#F59E0B" />
-              <stop offset="100%" stopColor="#10B981" />
+            <linearGradient id="scoreGradientDark" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FF0080" />
+              <stop offset="50%" stopColor="#FAFF00" />
+              <stop offset="100%" stopColor="#00FF88" />
             </linearGradient>
           </defs>
           <circle
@@ -114,7 +114,7 @@ export function ScoreRing({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="#E8ECF0"
+            stroke="#2A2A2A"
             strokeWidth={strokeWidth}
           />
           {/* Progress ring */}
@@ -130,14 +130,14 @@ export function ScoreRing({
             strokeDashoffset={isVisible ? strokeDashoffset : circumference}
             className="transition-all duration-[2000ms] ease-out"
             style={{
-              filter: `drop-shadow(0 0 8px ${scoreColor}40)`,
+              filter: `drop-shadow(0 0 12px ${scoreColor}60)`,
             }}
           />
         </svg>
 
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-mono text-5xl md:text-6xl font-bold text-abyss tabular-nums">
+          <span className="font-mono text-5xl md:text-6xl font-bold text-pure-white tabular-nums number-counter">
             {displayScore}
           </span>
           <span className="text-sm text-text-muted font-medium">
@@ -150,7 +150,7 @@ export function ScoreRing({
           className="absolute inset-0 rounded-full opacity-20 blur-xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${scoreColor} 0%, transparent 70%)`,
-            opacity: isVisible ? 0.2 : 0,
+            opacity: isVisible ? 0.3 : 0,
           }}
         />
       </div>

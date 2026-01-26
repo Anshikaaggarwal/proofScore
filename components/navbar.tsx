@@ -57,7 +57,7 @@ export function Navbar({ isConnected = false, address, onConnect, onDisconnect }
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled
-          ? "bg-pure-white/80 backdrop-blur-xl border-b border-pearl-gray shadow-sm"
+          ? "bg-deep-black/90 backdrop-blur-xl border-b border-white/5"
           : "bg-transparent"
       )}
     >
@@ -74,10 +74,10 @@ export function Navbar({ isConnected = false, address, onConnect, onDisconnect }
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-text-secondary hover:text-abyss transition-colors duration-200 text-sm font-medium relative group"
+                className="text-light-gray hover:text-pure-white transition-colors duration-200 text-sm font-medium relative group uppercase tracking-wide"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-aleo-teal to-electric-violet transition-all duration-200 group-hover:w-full rounded-full" />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-neon-cyan to-neon-green transition-all duration-200 group-hover:w-full rounded-full" />
               </Link>
             ))}
           </div>
@@ -90,39 +90,39 @@ export function Navbar({ isConnected = false, address, onConnect, onDisconnect }
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="hidden sm:flex items-center gap-2 bg-soft-cream/80 border-pearl-gray hover:border-aleo-teal/40 hover:bg-soft-cream text-abyss rounded-xl"
+                    className="hidden sm:flex items-center gap-2 bg-charcoal/80 border-white/10 hover:border-neon-cyan/40 hover:bg-charcoal text-pure-white rounded-lg"
                   >
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75" />
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-green" />
                     </span>
                     <span className="font-mono text-sm">{truncateAddress(address)}</span>
-                    <ChevronDown className="w-4 h-4 text-text-secondary" />
+                    <ChevronDown className="w-4 h-4 text-light-gray" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-56 bg-pure-white border-pearl-gray rounded-xl shadow-lg"
+                  className="w-56 bg-carbon border-white/10 rounded-lg"
                 >
                   <DropdownMenuItem
                     onClick={copyAddress}
-                    className="cursor-pointer hover:bg-soft-cream rounded-lg"
+                    className="cursor-pointer hover:bg-charcoal rounded-lg text-pure-white"
                   >
                     {copied ? (
                       <Check className="w-4 h-4 mr-2 text-neon-green" />
                     ) : (
-                      <Copy className="w-4 h-4 mr-2 text-text-secondary" />
+                      <Copy className="w-4 h-4 mr-2 text-light-gray" />
                     )}
                     {copied ? "Copied!" : "Copy Address"}
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-soft-cream rounded-lg">
-                    <ExternalLink className="w-4 h-4 mr-2 text-text-secondary" />
+                  <DropdownMenuItem className="cursor-pointer hover:bg-charcoal rounded-lg text-pure-white">
+                    <ExternalLink className="w-4 h-4 mr-2 text-light-gray" />
                     View on Explorer
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-pearl-gray" />
+                  <DropdownMenuSeparator className="bg-white/10" />
                   <DropdownMenuItem
                     onClick={onDisconnect}
-                    className="cursor-pointer hover:bg-coral-red/10 text-coral-red rounded-lg"
+                    className="cursor-pointer hover:bg-hot-pink/10 text-hot-pink rounded-lg"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Disconnect
@@ -132,17 +132,17 @@ export function Navbar({ isConnected = false, address, onConnect, onDisconnect }
             ) : (
               <Button
                 onClick={onConnect}
-                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-aleo-teal to-electric-violet hover:from-aleo-teal/90 hover:to-electric-violet/90 text-white font-semibold transition-all duration-200 rounded-xl btn-glow"
+                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-neon-cyan to-neon-green hover:opacity-90 text-void-black font-semibold transition-all duration-200 rounded-lg uppercase tracking-wide text-sm"
               >
                 <Wallet className="w-4 h-4" />
-                Connect Wallet
+                Connect
               </Button>
             )}
 
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-abyss hover:text-aleo-teal transition-colors rounded-lg hover:bg-soft-cream"
+              className="md:hidden p-2 text-pure-white hover:text-neon-cyan transition-colors rounded-lg hover:bg-charcoal"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -157,28 +157,28 @@ export function Navbar({ isConnected = false, address, onConnect, onDisconnect }
             isMobileMenuOpen ? "max-h-96 pb-4" : "max-h-0"
           )}
         >
-          <div className="flex flex-col gap-2 pt-4 border-t border-pearl-gray">
+          <div className="flex flex-col gap-2 pt-4 border-t border-white/5">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-text-secondary hover:text-abyss hover:bg-soft-cream transition-colors duration-200 text-base font-medium py-3 px-4 rounded-xl"
+                className="text-light-gray hover:text-pure-white hover:bg-charcoal transition-colors duration-200 text-base font-medium py-3 px-4 rounded-lg uppercase tracking-wide"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-4 mt-2 border-t border-pearl-gray">
+            <div className="pt-4 mt-2 border-t border-white/5">
               {isConnected && address ? (
                 <div className="flex flex-col gap-3 px-4">
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 rounded-full bg-neon-green" />
-                    <span className="font-mono text-text-secondary">{truncateAddress(address)}</span>
+                    <span className="font-mono text-light-gray">{truncateAddress(address)}</span>
                   </div>
                   <Button
                     onClick={onDisconnect}
                     variant="outline"
-                    className="w-full border-coral-red/30 text-coral-red hover:bg-coral-red/10 bg-transparent rounded-xl"
+                    className="w-full border-hot-pink/30 text-hot-pink hover:bg-hot-pink/10 bg-transparent rounded-lg"
                   >
                     Disconnect
                   </Button>
@@ -187,7 +187,7 @@ export function Navbar({ isConnected = false, address, onConnect, onDisconnect }
                 <div className="px-4">
                   <Button
                     onClick={onConnect}
-                    className="w-full bg-gradient-to-r from-aleo-teal to-electric-violet text-white font-semibold rounded-xl"
+                    className="w-full bg-gradient-to-r from-neon-cyan to-neon-green text-void-black font-semibold rounded-lg uppercase tracking-wide"
                   >
                     <Wallet className="w-4 h-4 mr-2" />
                     Connect Wallet
