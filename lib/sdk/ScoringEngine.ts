@@ -12,7 +12,7 @@
  * @version 2.0.0
  */
 
-import { SCORING_CONFIG, RISK_LEVELS } from '@/lib/constants';
+import { SCORING_CONFIG } from '@/lib/constants';
 import type { WalletMetrics, CreditAssessment, RiskLevel } from '@/types/sdk';
 
 /**
@@ -70,16 +70,20 @@ export class ScoringEngine {
         const repaymentScore = this.calculateRepaymentScore(metrics);
         const balanceScore = this.calculateBalanceScore(metrics);
 
-        // Apply weights and calculate weighted bonus
-        const weightedBonus =
-            (transactionScore * FACTOR_WEIGHTS.TRANSACTION_HISTORY) +
-            (ageScore * FACTOR_WEIGHTS.WALLET_AGE) +
-            (defiScore * FACTOR_WEIGHTS.DEFI_ACTIVITY) +
-            (repaymentScore * FACTOR_WEIGHTS.REPAYMENT_BEHAVIOR) +
-            (balanceScore * FACTOR_WEIGHTS.BALANCE_STABILITY);
+        // Apply weights and calculate weighted bonus (0-100 scale)
+        const weightedSum =
+            (transactionScore * (FACTOR_WEIGHTS.TRANSACTION_HISTORY * 100)) +
+            (ageScore * (FACTOR_WEIGHTS.WALLET_AGE * 100)) +
+            (defiScore * (FACTOR_WEIGHTS.DEFI_ACTIVITY * 100)) +
+            (repaymentScore * (FACTOR_WEIGHTS.REPAYMENT_BEHAVIOR * 100)) +
+            (balanceScore * (FACTOR_WEIGHTS.BALANCE_STABILITY * 100));
 
-        // Convert weighted bonus to credit score points (max 550 points)
-        const bonusPoints = Math.round(weightedBonus * 5.5);
+        // Normalize weighted sum back to 0-100 (divided by 100 because weights were scaled up)
+        const normalizedScore = weightedSum / 100;
+
+        // Convert key performance indicators to credit score points (max 550 points)
+        // Formula: Base (300) + (NormalizedScore% of 550)
+        const bonusPoints = Math.round((normalizedScore / 100) * 550);
 
         // Calculate final score (300-850 range)
         const rawScore = baseScore + bonusPoints;
@@ -393,7 +397,7 @@ export class ScoringEngine {
                 name: f.name,
                 score: f.score,
                 weight: f.weight * 100, // Convert to percentage
-                contribution: Math.round(f.contribution * 5.5), // Convert to points
+                contribution: Math.round((f.score * f.weight * 550) / 100), // Precise contribution points
                 rating: f.rating,
             })),
             total: assessment.finalScore,

@@ -7,6 +7,13 @@
 // WALLET METRICS
 // ============================================================================
 
+export interface Transaction {
+    id: string;
+    type: 'transfer' | 'execution' | 'fee';
+    amount: number;
+    timestamp: number;
+}
+
 export interface WalletMetrics {
     address: string;
     transactionCount: number;

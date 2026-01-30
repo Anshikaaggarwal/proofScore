@@ -14,32 +14,47 @@ import { ProofGenerationModal } from '@/components/ProofGenerationModal';
 import { ScoringEngine } from '@/lib/sdk';
 import type { CreditAssessment } from '@/types/sdk';
 import { usePuzzleWallet } from '@/lib/hooks/usePuzzleWallet';
-import { useWalletMetricsWithCache } from '@/hooks/useWalletMetrics';
+import { useWalletMetrics } from '@/hooks/useWalletMetrics';
 
 export default function DashboardPage() {
     const { address, isConnected } = usePuzzleWallet();
-    const { metrics, loading: metricsLoading, error: metricsError, refetch } = useWalletMetricsWithCache(address);
+    const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics } = useWalletMetrics();
     const [assessment, setAssessment] = useState<CreditAssessment | null>(null);
     const [isGeneratingScore, setIsGeneratingScore] = useState(false);
     const [isProofModalOpen, setIsProofModalOpen] = useState(false);
+
+    // Fetch metrics when wallet is connected
+    useEffect(() => {
+        if (address && !metrics && !metricsLoading) {
+            fetchMetrics(address);
+        }
+    }, [address, metrics, metricsLoading, fetchMetrics]);
 
     // Generate credit score when metrics are available
     useEffect(() => {
         if (metrics && !assessment) {
             setIsGeneratingScore(true);
-            // Simulate score generation delay for better UX
-            setTimeout(() => {
-                const calculatedAssessment = ScoringEngine.calculateScore(metrics);
-                setAssessment(calculatedAssessment);
+            try {
+                // Short delay to allow UI to show "Generating..." state for better UX
+                const timer = setTimeout(() => {
+                    const calculatedAssessment = ScoringEngine.calculateScore(metrics);
+                    setAssessment(calculatedAssessment);
+                    setIsGeneratingScore(false);
+                }, 800);
+                return () => clearTimeout(timer);
+            } catch (error) {
+                console.error("Score generation failed", error);
                 setIsGeneratingScore(false);
-            }, 1000);
+            }
         }
     }, [metrics, assessment]);
 
     // Handle refresh
     const handleRefresh = async () => {
-        setAssessment(null);
-        await refetch();
+        if (address) {
+            setAssessment(null);
+            await fetchMetrics(address);
+        }
     };
 
     // Check if wallet is connected
