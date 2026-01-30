@@ -8,7 +8,8 @@
  * @module lib/sdk/ProofGenerator
  */
 
-import { groth16 } from 'snarkjs';
+// TODO: Uncomment when integrating real snarkjs
+// import { groth16 } from 'snarkjs';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex } from '@noble/hashes/utils';
 import type { CreditAssessment, ZKProof } from '@/types/sdk';
@@ -147,7 +148,7 @@ export class ProofGenerator {
      * @returns Proof components
      */
     private async runGroth16Prover(
-        witness: Record<string, unknown>
+        _witness: Record<string, unknown>
     ): Promise<{ a: string[]; b: string[][]; c: string[] }> {
         // Simulate computation time (2-3 seconds)
         await this.simulateComputation();

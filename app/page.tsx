@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Zap, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { Navigation } from '@/components/landing/Navigation';
