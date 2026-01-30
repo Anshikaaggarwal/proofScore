@@ -16,15 +16,16 @@ export default function HomePage() {
       {/* Animated gradient background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="gradient-blur gradient-blur-cyan absolute -top-40 -left-40 opacity-20" />
-        <div className="gradient-blur gradient-blur-green absolute top-1/2 -right-40 opacity-15" />
+        <div className="gradient-blur gradient-blur-green absolute top-1/2 -right-40 opacity-10" />
         <div className="gradient-blur gradient-blur-purple absolute -bottom-40 left-1/2 opacity-10" />
       </div>
+
 
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 grid-pattern opacity-30" />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 py-20">
+      <section className="relative min-h-screen flex items-center justify-center px-6 pt-20 pb-32">
         <div className="max-w-7xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -92,7 +93,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
-              className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12"
+              className="relative z-20 grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12"
             >
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-neon-cyan">
@@ -104,7 +105,10 @@ export default function HomePage() {
                 <div className="text-3xl md:text-4xl font-bold text-neon-green">
                   <span className="number-counter">100%</span>
                 </div>
-                <div className="text-sm text-text-muted mt-1">Private</div>
+                <div className="text-sm text-text-muted mt-2 leading-relaxed">
+  Private
+</div>
+
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-electric-purple">
