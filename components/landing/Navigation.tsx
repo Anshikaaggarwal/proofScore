@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Wallet, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import { useWallet, useFormattedAddress } from '@/lib/providers/WalletProvider';
+import { useAleoWallet, useFormattedAddress } from '@/hooks/useAleoWallet';
+import { useWalletModal } from '@demox-labs/aleo-wallet-adapter-reactui';
 
 export function Navigation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { address, isConnected, isConnecting, connect, disconnect } = useWallet();
-    const formattedAddress = useFormattedAddress(address);
+    const { address, isConnected, isConnecting, disconnect, walletName } = useAleoWallet();
+    const formattedAddress = useFormattedAddress();
+    const { setVisible } = useWalletModal();
 
     const navLinks = [
         { href: '#features', label: 'Features' },
@@ -22,7 +24,7 @@ export function Navigation() {
         if (isConnected) {
             disconnect();
         } else {
-            connect();
+            setVisible(true); // Open wallet selection modal
         }
     };
 

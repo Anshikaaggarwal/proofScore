@@ -3,8 +3,12 @@
 import { motion } from 'framer-motion';
 import { Shield, Zap, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { Navigation } from '@/components/landing/Navigation';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <div className="relative w-full overflow-hidden bg-deep-black">
       {/* Navigation */}
@@ -68,14 +72,19 @@ export default function HomePage() {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
-              <button className="btn-primary group px-8 py-4 text-lg flex items-center gap-2">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="btn-primary group px-8 py-4 text-lg flex items-center gap-2"
+              >
                 Generate Your Score
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
 
-              <button className="btn-outline px-8 py-4 text-lg">
-                View Documentation
-              </button>
+              <Link href="/docs">
+                <button className="btn-outline px-8 py-4 text-lg">
+                  View Documentation
+                </button>
+              </Link>
             </motion.div>
 
             {/* Stats */}
@@ -298,7 +307,10 @@ export default function HomePage() {
             <p className="text-xl text-text-secondary max-w-2xl mx-auto">
               Join the future of decentralized finance with privacy-preserving credit scores
             </p>
-            <button className="btn-primary group px-10 py-5 text-lg mt-6">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="btn-primary group px-10 py-5 text-lg mt-6"
+            >
               Get Started Now
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
             </button>
