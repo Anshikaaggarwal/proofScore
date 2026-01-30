@@ -1,0 +1,11 @@
+[users]
+public_scores = {
+    "aleo1gy32...": 750u64
+}
+
+[generate_score]
+tx_count = 150u64
+wallet_age = 18u64
+defi_score = 60u64
+repayment_rate = 95u64
+balance_tier = 80u64
