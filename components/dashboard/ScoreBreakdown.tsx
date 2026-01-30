@@ -38,36 +38,16 @@ export function ScoreBreakdown({ assessment }: ScoreBreakdownProps) {
         return colorMap[color as keyof typeof colorMap] || colorMap['neon-cyan'];
     };
 
-    const bonusItems = [
-        {
-            label: 'Transaction Volume',
-            value: breakdown.bonuses.transactions,
-            max: 100,
-            color: 'neon-cyan',
-            description: 'Based on total transaction count',
-        },
-        {
-            label: 'Wallet Age',
-            value: breakdown.bonuses.walletAge,
-            max: 100,
-            color: 'neon-green',
-            description: 'Account maturity bonus',
-        },
-        {
-            label: 'DeFi Activity',
-            value: breakdown.bonuses.defiActivity,
-            max: 100,
-            color: 'electric-purple',
-            description: 'Protocol interaction score',
-        },
-        {
-            label: 'Repayment History',
-            value: breakdown.bonuses.repaymentRate,
-            max: 150,
-            color: 'neon-yellow',
-            description: 'Loan repayment reliability',
-        },
-    ];
+    const bonusItems = breakdown.factors.map(factor => ({
+        label: factor.name,
+        value: factor.contribution,
+        max: 100, // All factors are on 0-100 scale
+        color: factor.rating === 'excellent' ? 'neon-green' :
+            factor.rating === 'good' ? 'neon-cyan' :
+                factor.rating === 'fair' ? 'electric-purple' :
+                    'neon-yellow',
+        description: `${factor.score}/100 score (${factor.weight}% weight)`,
+    }));
 
     return (
         <div className="glass-card p-8">

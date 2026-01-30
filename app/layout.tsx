@@ -1,9 +1,7 @@
-import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
-import { WalletProvider } from '@/lib/providers/WalletProvider';
-import { AleoWalletProvider } from '@/lib/providers/AleoWalletProvider';
+import { ClientProviders } from '@/lib/providers/ClientProviders';
 import './globals.css';
 
 // Primary font: Inter (modern, clean, professional)
@@ -89,22 +87,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         {/* Noise overlay for texture */}
         <div className="noise-overlay" />
 
-        {/* Global Providers */}
-        <AleoWalletProvider autoConnect>
-          <WalletProvider>
-            {/* Main content */}
-            <main className="relative min-h-screen">
-              {children}
-            </main>
-          </WalletProvider>
-        </AleoWalletProvider>
+        {/* Global Providers - All client-side providers wrapped in ClientProviders */}
+        <ClientProviders>
+          {/* Main content */}
+          <main className="relative min-h-screen">
+            {children}
+          </main>
+        </ClientProviders>
 
         {/* Analytics */}
         <Analytics />

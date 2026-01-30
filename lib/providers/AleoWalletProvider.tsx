@@ -4,7 +4,13 @@
  * Aleo Wallet Adapter Provider
  * 
  * Production-ready wallet integration for Aleo blockchain
- * Supports multiple wallet types with automatic reconnection
+ * Supports multiple wallet types with automatic detection
+ * 
+ * Supported Wallets:
+ * - Leo Wallet (Browser Extension)
+ * - Puzzle Wallet (Browser Extension)
+ * - Fox Wallet (Browser Extension)
+ * - Soter Wallet (Browser Extension)
  * 
  * @module lib/providers/AleoWalletProvider
  */
@@ -29,6 +35,11 @@ interface AleoWalletProviderProps {
  * Wraps the application with Aleo wallet adapter functionality
  * Provides wallet connection, signing, and transaction capabilities
  * 
+ * How it works:
+ * 1. The WalletProvider automatically detects installed browser extension wallets
+ * 2. Users can connect via the WalletMultiButton component
+ * 3. Once connected, wallet state is available via useWallet() hook
+ * 
  * @example
  * ```tsx
  * <AleoWalletProvider network={WalletAdapterNetwork.TestnetBeta} autoConnect>
@@ -42,18 +53,19 @@ export function AleoWalletProvider({
     autoConnect = true,
 }: AleoWalletProviderProps) {
     // Wallet configuration
-    const wallets = useMemo(() => {
-        // Note: Wallet adapters will be auto-detected from browser extensions
-        // No need to manually instantiate them
-        return [];
-    }, []);
+    // Empty array allows auto-detection of browser extension wallets
+    // The adapter will automatically find: Leo Wallet, Puzzle Wallet, Fox Wallet, etc.
+    const wallets = useMemo(() => [], []);
 
     // Decrypt permission for ZK proof generation
+    // UponRequest = wallet will ask user permission when needed
     const decryptPermission = DecryptPermission.UponRequest;
 
     // Programs that require decryption permission
+    // This allows the wallet to decrypt records from these programs
     const programs = useMemo(() => {
-        return [process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'credit_score.aleo'];
+        const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'credit_score.aleo';
+        return [contractAddress];
     }, []);
 
     return (
@@ -77,8 +89,15 @@ export function AleoWalletProvider({
  * Helper to get network configuration based on environment
  */
 export function getAleoNetwork(): WalletAdapterNetwork {
-    // Currently using TestnetBeta as it's the supported network
-    // Update when mainnet support is added
+    const envNetwork = process.env.NEXT_PUBLIC_ALEO_NETWORK;
+
+    if (envNetwork === 'mainnet') {
+        return WalletAdapterNetwork.Mainnet;
+    } else if (envNetwork === 'testnet') {
+        return WalletAdapterNetwork.Testnet;
+    }
+
+    // Default to TestnetBeta (most commonly used for development)
     return WalletAdapterNetwork.TestnetBeta;
 }
 
@@ -93,8 +112,18 @@ export function getAleoRpcUrl(): string {
         return process.env.NEXT_PUBLIC_ALEO_RPC;
     }
 
-    // Default RPC endpoint for testnet
-    return 'https://api.explorer.provable.com/v1';
+    // Default RPC endpoints based on network
+    const network = getAleoNetwork();
+
+    switch (network) {
+        case WalletAdapterNetwork.Mainnet:
+            return 'https://api.explorer.aleo.org/v1';
+        case WalletAdapterNetwork.Testnet:
+            return 'https://api.explorer.provable.com/v1';
+        case WalletAdapterNetwork.TestnetBeta:
+        default:
+            return 'https://api.explorer.provable.com/v1';
+    }
 }
 
 /**
@@ -103,6 +132,14 @@ export function getAleoRpcUrl(): string {
  * Get block explorer URL based on network
  */
 export function getAleoExplorerUrl(): string {
-    // Default explorer for testnet
-    return 'https://explorer.provable.com';
+    const network = getAleoNetwork();
+
+    switch (network) {
+        case WalletAdapterNetwork.Mainnet:
+            return 'https://explorer.aleo.org';
+        case WalletAdapterNetwork.Testnet:
+        case WalletAdapterNetwork.TestnetBeta:
+        default:
+            return 'https://explorer.provable.com';
+    }
 }

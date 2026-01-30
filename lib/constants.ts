@@ -54,6 +54,7 @@ export const COLORS = {
 
 export const SCORING_CONFIG = {
     BASE_SCORE: 300,
+    MIN_SCORE: 300,
     MAX_SCORE: 850,
     BONUSES: {
         TRANSACTION_COUNT: {

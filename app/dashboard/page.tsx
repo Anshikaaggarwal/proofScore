@@ -1,68 +1,99 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink, Clock } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Clock, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { MetricsGrid } from '@/components/dashboard/MetricsGrid';
 import { ScoreBreakdown } from '@/components/dashboard/ScoreBreakdown';
+import { ScoreInsights } from '@/components/dashboard/ScoreInsights';
 import { ActionCards, QuickActions } from '@/components/dashboard/ActionCards';
 import { Navigation } from '@/components/landing/Navigation';
+import { ProofGenerationModal } from '@/components/ProofGenerationModal';
 import { ScoringEngine } from '@/lib/sdk';
-import type { WalletMetrics, CreditAssessment } from '@/types/sdk';
+import type { CreditAssessment } from '@/types/sdk';
+import { usePuzzleWallet } from '@/lib/hooks/usePuzzleWallet';
+import { useWalletMetricsWithCache } from '@/hooks/useWalletMetrics';
 
 export default function DashboardPage() {
-    const [isLoading, setIsLoading] = useState(true);
-    const [metrics, setMetrics] = useState<WalletMetrics | null>(null);
+    const { address, isConnected } = usePuzzleWallet();
+    const { metrics, loading: metricsLoading, error: metricsError, refetch } = useWalletMetricsWithCache(address);
     const [assessment, setAssessment] = useState<CreditAssessment | null>(null);
+    const [isGeneratingScore, setIsGeneratingScore] = useState(false);
+    const [isProofModalOpen, setIsProofModalOpen] = useState(false);
 
-    // Mock data for demonstration
+    // Generate credit score when metrics are available
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            const mockMetrics: WalletMetrics = {
-                address: 'aleo1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq3ljyzc',
-                transactionCount: 127,
-                walletAgeMonths: 18,
-                defiScore: 72,
-                repaymentRate: 94,
-                tokenBalance: 15420,
-                lastTransactionDate: Date.now() - 86400000 * 3, // 3 days ago
-            };
+        if (metrics && !assessment) {
+            setIsGeneratingScore(true);
+            // Simulate score generation delay for better UX
+            setTimeout(() => {
+                const calculatedAssessment = ScoringEngine.calculateScore(metrics);
+                setAssessment(calculatedAssessment);
+                setIsGeneratingScore(false);
+            }, 1000);
+        }
+    }, [metrics, assessment]);
 
-            const mockAssessment = ScoringEngine.calculateScore(mockMetrics);
+    // Handle refresh
+    const handleRefresh = async () => {
+        setAssessment(null);
+        await refetch();
+    };
 
-            setMetrics(mockMetrics);
-            setAssessment(mockAssessment);
-            setIsLoading(false);
-        }, 1500);
-    }, []);
-
-    if (isLoading) {
+    // Check if wallet is connected
+    if (!isConnected || !address) {
         return (
             <div className="min-h-screen bg-deep-black flex items-center justify-center">
                 <div className="text-center space-y-4">
-                    <div className="w-16 h-16 border-4 border-neon-cyan/30 border-t-neon-cyan rounded-full animate-spin mx-auto" />
-                    <div className="text-text-secondary">Loading your credit score...</div>
+                    <div className="text-2xl font-bold text-pure-white">Wallet Not Connected</div>
+                    <div className="text-text-secondary">Please connect your Puzzle Wallet to view your credit score</div>
+                    <Link href="/" className="btn-primary inline-block px-6 py-3 mt-4">Go Back Home</Link>
                 </div>
             </div>
         );
     }
 
+    // Show loading state
+    if (metricsLoading || isGeneratingScore) {
+        return (
+            <div className="min-h-screen bg-deep-black flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <div className="w-16 h-16 border-4 border-neon-cyan/30 border-t-neon-cyan rounded-full animate-spin mx-auto" />
+                    <div className="text-text-secondary">{metricsLoading ? 'Fetching wallet data from blockchain...' : 'Generating your credit score...'}</div>
+                </div>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (metricsError) {
+        return (
+            <div className="min-h-screen bg-deep-black flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <div className="text-2xl font-bold text-hot-pink">Error Loading Data</div>
+                    <div className="text-text-secondary max-w-md">{metricsError}</div>
+                    <button onClick={handleRefresh} className="btn-primary inline-flex items-center gap-2 px-6 py-3 mt-4">
+                        <RefreshCw className="w-4 h-4" />
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // Show no data state
     if (!metrics || !assessment) {
         return (
             <div className="min-h-screen bg-deep-black flex items-center justify-center">
                 <div className="text-center space-y-4">
-                    <div className="text-2xl font-bold text-pure-white">
-                        No Score Found
-                    </div>
-                    <div className="text-text-secondary">
-                        Generate your first credit score to view your dashboard
-                    </div>
-                    <Link href="/" className="btn-primary inline-block px-6 py-3 mt-4">
-                        Generate Score
-                    </Link>
+                    <div className="text-2xl font-bold text-pure-white">No Score Available</div>
+                    <div className="text-text-secondary">Unable to generate credit score. Please try refreshing.</div>
+                    <button onClick={handleRefresh} className="btn-primary inline-flex items-center gap-2 px-6 py-3 mt-4">
+                        <RefreshCw className="w-4 h-4" />
+                        Refresh Data
+                    </button>
                 </div>
             </div>
         );
@@ -199,6 +230,17 @@ export default function DashboardPage() {
                                             <ExternalLink className="w-4 h-4" />
                                         </a>
                                     )}
+
+                                    {/* Generate Proof Button */}
+                                    <button
+                                        onClick={() => setIsProofModalOpen(true)}
+                                        className="btn-primary w-full mt-4 flex items-center justify-center gap-2"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                        Generate ZK Proof
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -266,6 +308,21 @@ export default function DashboardPage() {
                     </motion.div>
                 </div>
             </div>
+
+            {/* Proof Generation Modal */}
+            <ProofGenerationModal
+                isOpen={isProofModalOpen}
+                onClose={() => setIsProofModalOpen(false)}
+                assessment={assessment}
+                walletAddress={address || ''}
+                onProofGenerated={(proof) => {
+                    console.log('Proof generated:', proof);
+                }}
+                onSubmissionComplete={(transactionId) => {
+                    console.log('Submission complete:', transactionId);
+                    // Could update mockTransactionId here
+                }}
+            />
         </div>
     );
 }

@@ -5,9 +5,39 @@ import { Shield, Zap, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { Navigation } from '@/components/landing/Navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { usePuzzleWallet } from '@/lib/hooks/usePuzzleWallet';
+import { useState } from 'react';
 
 export default function HomePage() {
   const router = useRouter();
+  const puzzleWallet = usePuzzleWallet();
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  // Check if wallet is connected
+  const isWalletConnected = puzzleWallet.isConnected;
+
+  // Handle "Generate Your Score" button click
+  const handleGenerateScore = async () => {
+    if (isWalletConnected) {
+      // Wallet already connected, go to dashboard
+      router.push('/dashboard');
+    } else {
+      // Try to connect wallet
+      setIsConnecting(true);
+      try {
+        // Connect Puzzle Wallet
+        await puzzleWallet.connect();
+        // If successful, navigate to dashboard
+        router.push('/dashboard');
+      } catch (error) {
+        console.log('[HomePage] Puzzle Wallet connection failed:', error);
+        // Show a message
+        alert('Please connect your Puzzle Wallet using the "Connect Wallet" button in the navigation bar.');
+      } finally {
+        setIsConnecting(false);
+      }
+    }
+  };
 
   return (
     <div className="relative w-full overflow-hidden bg-deep-black">
@@ -73,11 +103,26 @@ export default function HomePage() {
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
               <button
-                onClick={() => router.push('/dashboard')}
-                className="btn-primary group px-8 py-4 text-lg flex items-center gap-2"
+                onClick={handleGenerateScore}
+                disabled={isConnecting}
+                className="btn-primary group px-8 py-4 text-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Generate Your Score
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                {isConnecting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-void-black/30 border-t-void-black rounded-full animate-spin" />
+                    Connecting...
+                  </>
+                ) : isWalletConnected ? (
+                  <>
+                    Generate Your Score
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                ) : (
+                  <>
+                    Connect Wallet & Start
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
               </button>
 
               <Link href="/docs">
@@ -308,10 +353,11 @@ export default function HomePage() {
               Join the future of decentralized finance with privacy-preserving credit scores
             </p>
             <button
-              onClick={() => router.push('/dashboard')}
-              className="btn-primary group px-10 py-5 text-lg mt-6"
+              onClick={handleGenerateScore}
+              disabled={isConnecting}
+              className="btn-primary group px-10 py-5 text-lg mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Get Started Now
+              {isConnecting ? 'Connecting...' : isWalletConnected ? 'Get Started Now' : 'Connect Wallet & Start'}
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform inline-block" />
             </button>
           </motion.div>

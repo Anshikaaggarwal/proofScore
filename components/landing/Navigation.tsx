@@ -1,17 +1,25 @@
 'use client';
 
+/**
+ * Enhanced Navigation Component with Puzzle Wallet
+ * 
+ * Uses Puzzle Wallet SDK for wallet integration
+ */
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Wallet, ExternalLink } from 'lucide-react';
+import { Menu, X, Wallet, ExternalLink, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { useAleoWallet, useFormattedAddress } from '@/hooks/useAleoWallet';
-import { useWalletModal } from '@demox-labs/aleo-wallet-adapter-reactui';
+import { usePuzzleWallet } from '@/lib/hooks/usePuzzleWallet';
 
 export function Navigation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { address, isConnected, isConnecting, disconnect, walletName } = useAleoWallet();
-    const formattedAddress = useFormattedAddress();
-    const { setVisible } = useWalletModal();
+    const [showWalletMenu, setShowWalletMenu] = useState(false);
+    const puzzleWallet = usePuzzleWallet();
+
+    // Check if wallet is connected
+    const isConnected = puzzleWallet.isConnected;
+    const connectedAddress = puzzleWallet.address;
 
     const navLinks = [
         { href: '#features', label: 'Features' },
@@ -20,12 +28,10 @@ export function Navigation() {
         { href: 'https://github.com/proofscore', label: 'GitHub', external: true },
     ];
 
-    const handleWalletAction = () => {
-        if (isConnected) {
-            disconnect();
-        } else {
-            setVisible(true); // Open wallet selection modal
-        }
+    // Format address for display
+    const formatAddress = (address: string | null) => {
+        if (!address) return '';
+        return `${address.slice(0, 10)}...${address.slice(-8)}`;
     };
 
     return (
@@ -64,23 +70,50 @@ export function Navigation() {
                             ))}
                         </div>
 
-                        {/* Desktop CTA */}
+                        {/* Desktop Wallet Button */}
                         <div className="hidden md:flex items-center gap-4">
-                            <button
-                                onClick={handleWalletAction}
-                                disabled={isConnecting}
-                                className={`
-                  px-6 py-2.5 rounded-lg font-medium text-sm transition-all flex items-center gap-2
-                  ${isConnected
-                                        ? 'bg-neon-green/10 border border-neon-green/30 text-neon-green'
-                                        : 'btn-primary'
-                                    }
-                  ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
-                            >
-                                <Wallet className="w-4 h-4" />
-                                {isConnecting ? 'Connecting...' : isConnected ? formattedAddress : 'Connect Wallet'}
-                            </button>
+                            {isConnected ? (
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowWalletMenu(!showWalletMenu)}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all"
+                                    >
+                                        <Wallet className="w-4 h-4 text-neon-cyan" />
+                                        <span className="text-sm font-medium text-neon-cyan">
+                                            {formatAddress(connectedAddress)}
+                                        </span>
+                                        <ChevronDown className="w-4 h-4 text-neon-cyan" />
+                                    </button>
+
+                                    {showWalletMenu && (
+                                        <div className="absolute top-full right-0 mt-2 w-48 glass-card p-2 space-y-1 z-50">
+                                            <button
+                                                onClick={() => {
+                                                    puzzleWallet.disconnect();
+                                                    setShowWalletMenu(false);
+                                                }}
+                                                className="w-full text-left px-3 py-2 text-sm text-text-secondary hover:text-neon-cyan hover:bg-neon-cyan/10 rounded-lg transition-all"
+                                            >
+                                                Disconnect
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            await puzzleWallet.connect();
+                                        } catch (error) {
+                                            console.log('Puzzle Wallet connection failed:', error);
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all text-sm font-medium text-neon-cyan"
+                                >
+                                    <Wallet className="w-4 h-4 inline mr-2" />
+                                    Connect Wallet
+                                </button>
+                            )}
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -124,24 +157,33 @@ export function Navigation() {
                                 </a>
                             ))}
                             <div className="pt-4 border-t border-glass-border">
-                                <button
-                                    onClick={() => {
-                                        handleWalletAction();
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    disabled={isConnecting}
-                                    className={`
-                    w-full px-6 py-3 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2
-                    ${isConnected
-                                            ? 'bg-neon-green/10 border border-neon-green/30 text-neon-green'
-                                            : 'btn-primary'
-                                        }
-                    ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}
-                  `}
-                                >
-                                    <Wallet className="w-4 h-4" />
-                                    {isConnecting ? 'Connecting...' : isConnected ? formattedAddress : 'Connect Wallet'}
-                                </button>
+                                {isConnected ? (
+                                    <button
+                                        onClick={() => {
+                                            puzzleWallet.disconnect();
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className="w-full px-4 py-2 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all text-sm font-medium text-neon-cyan"
+                                    >
+                                        <Wallet className="w-4 h-4 inline mr-2" />
+                                        Disconnect ({formatAddress(connectedAddress)})
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                await puzzleWallet.connect();
+                                                setMobileMenuOpen(false);
+                                            } catch (error) {
+                                                console.log('Puzzle Wallet connection failed:', error);
+                                            }
+                                        }}
+                                        className="w-full px-4 py-2 rounded-xl bg-neon-cyan/10 border border-neon-cyan/30 hover:bg-neon-cyan/20 transition-all text-sm font-medium text-neon-cyan"
+                                    >
+                                        <Wallet className="w-4 h-4 inline mr-2" />
+                                        Connect Wallet
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </motion.div>

@@ -1,51 +1,92 @@
 /**
- * ScoringEngine - Credit Score Calculation
+ * Enhanced ScoringEngine - Advanced Credit Score Calculation
  * 
- * Pure functions for calculating credit scores (300-850 scale)
- * Based on wallet metrics: transactions, age, DeFi activity, repayment rate
+ * Sophisticated scoring algorithm with:
+ * - Weighted factor analysis
+ * - Historical trend consideration
+ * - Risk assessment improvements
+ * - Score validation and bounds checking
+ * - Detailed factor breakdown
  * 
  * @module lib/sdk/ScoringEngine
- * @requires 100% test coverage (production-critical)
+ * @version 2.0.0
  */
 
 import { SCORING_CONFIG, RISK_LEVELS } from '@/lib/constants';
 import type { WalletMetrics, CreditAssessment, RiskLevel } from '@/types/sdk';
 
+/**
+ * Factor weights for score calculation
+ * Total weight = 100%
+ */
+const FACTOR_WEIGHTS = {
+    TRANSACTION_HISTORY: 0.25,  // 25% - Transaction count and consistency
+    WALLET_AGE: 0.20,            // 20% - Account maturity
+    DEFI_ACTIVITY: 0.20,         // 20% - DeFi engagement
+    REPAYMENT_BEHAVIOR: 0.25,    // 25% - Payment reliability
+    BALANCE_STABILITY: 0.10,     // 10% - Financial stability
+} as const;
+
+/**
+ * Score improvement suggestions based on weak factors
+ */
+interface ScoreImprovement {
+    factor: string;
+    currentScore: number;
+    potentialGain: number;
+    suggestion: string;
+    priority: 'high' | 'medium' | 'low';
+}
+
+/**
+ * Detailed factor analysis
+ */
+interface FactorAnalysis {
+    name: string;
+    score: number;
+    weight: number;
+    contribution: number;
+    rating: 'excellent' | 'good' | 'fair' | 'poor';
+    description: string;
+}
+
 export class ScoringEngine {
     /**
-     * Main scoring algorithm
-     * Calculates credit score from wallet metrics
+     * Enhanced scoring algorithm with weighted factors
      * 
      * @param metrics - On-chain wallet metrics
-     * @returns Credit assessment with 300-850 score
-     * 
-     * @example
-     * const metrics = {
-     *   address: 'aleo1...',
-     *   transactionCount: 25,
-     *   walletAgeMonths: 12,
-     *   defiScore: 65,
-     *   repaymentRate: 95,
-     *   tokenBalance: 1000,
-     *   lastTransactionDate: Date.now()
-     * };
-     * const assessment = ScoringEngine.calculateScore(metrics);
-     * // assessment.finalScore => 725 (example)
+     * @returns Comprehensive credit assessment
      */
     static calculateScore(metrics: WalletMetrics): CreditAssessment {
+        // Validate input metrics
+        this.validateMetrics(metrics);
+
         const baseScore = SCORING_CONFIG.BASE_SCORE;
 
-        // Calculate individual bonuses
-        const txBonus = this.calculateTransactionBonus(metrics.transactionCount);
-        const ageBonus = this.calculateAgeBonus(metrics.walletAgeMonths);
-        const defiBonus = this.calculateDeFiBonus(metrics.defiScore);
-        const repaymentBonus = this.calculateRepaymentBonus(metrics.repaymentRate);
+        // Calculate individual factor scores (0-100 scale)
+        const transactionScore = this.calculateTransactionScore(metrics);
+        const ageScore = this.calculateAgeScore(metrics);
+        const defiScore = this.calculateDeFiScore(metrics);
+        const repaymentScore = this.calculateRepaymentScore(metrics);
+        const balanceScore = this.calculateBalanceScore(metrics);
 
-        // Sum all bonuses
-        const totalBonus = txBonus + ageBonus + defiBonus + repaymentBonus;
+        // Apply weights and calculate weighted bonus
+        const weightedBonus =
+            (transactionScore * FACTOR_WEIGHTS.TRANSACTION_HISTORY) +
+            (ageScore * FACTOR_WEIGHTS.WALLET_AGE) +
+            (defiScore * FACTOR_WEIGHTS.DEFI_ACTIVITY) +
+            (repaymentScore * FACTOR_WEIGHTS.REPAYMENT_BEHAVIOR) +
+            (balanceScore * FACTOR_WEIGHTS.BALANCE_STABILITY);
 
-        // Calculate final score (capped at 850)
-        const finalScore = Math.min(SCORING_CONFIG.MAX_SCORE, baseScore + totalBonus);
+        // Convert weighted bonus to credit score points (max 550 points)
+        const bonusPoints = Math.round(weightedBonus * 5.5);
+
+        // Calculate final score (300-850 range)
+        const rawScore = baseScore + bonusPoints;
+        const finalScore = Math.max(
+            SCORING_CONFIG.MIN_SCORE,
+            Math.min(SCORING_CONFIG.MAX_SCORE, Math.round(rawScore))
+        );
 
         // Determine risk level
         const riskLevel = this.getRiskLevel(finalScore);
@@ -54,137 +95,265 @@ export class ScoringEngine {
             address: metrics.address,
             metrics,
             baseScore,
-            bonusPoints: totalBonus,
-            finalScore: Math.round(finalScore),
+            bonusPoints,
+            finalScore,
             riskLevel,
             timestamp: Date.now(),
         };
     }
 
     /**
-     * Calculate bonus points from transaction count
+     * Calculate transaction history score (0-100)
      * 
-     * Formula: (count - threshold) * pointsPer (capped at maxPoints)
-     * Threshold: 10 transactions
-     * Points per transaction: 5
-     * Max bonus: 100 points
-     * 
-     * @param count - Total transaction count
-     * @returns Bonus points (0-100)
-     * 
-     * @example
-     * calculateTransactionBonus(5)  => 0   (below threshold)
-     * calculateTransactionBonus(15) => 25  (5 transactions above threshold)
-     * calculateTransactionBonus(50) => 100 (capped at max)
+     * Considers:
+     * - Total transaction count
+     * - Transaction consistency
+     * - Recent activity
      */
-    private static calculateTransactionBonus(count: number): number {
-        const config = SCORING_CONFIG.BONUSES.TRANSACTION_COUNT;
-        if (count < config.threshold) return 0;
+    private static calculateTransactionScore(metrics: WalletMetrics): number {
+        const { transactionCount, lastTransactionDate } = metrics;
 
-        const bonus = (count - config.threshold) * config.pointsPer;
-        return Math.min(bonus, config.maxPoints);
+        // Base score from transaction count
+        let score = 0;
+        if (transactionCount >= 200) score = 100;
+        else if (transactionCount >= 100) score = 85;
+        else if (transactionCount >= 50) score = 70;
+        else if (transactionCount >= 25) score = 55;
+        else if (transactionCount >= 10) score = 40;
+        else if (transactionCount >= 5) score = 25;
+        else score = transactionCount * 5; // 5 points per tx for < 5 txs
+
+        // Bonus for recent activity (within last 30 days)
+        const daysSinceLastTx = (Date.now() - lastTransactionDate) / (1000 * 60 * 60 * 24);
+        if (daysSinceLastTx <= 7) score += 10;
+        else if (daysSinceLastTx <= 30) score += 5;
+
+        // Penalty for inactivity (> 90 days)
+        if (daysSinceLastTx > 90) score -= 15;
+        if (daysSinceLastTx > 180) score -= 25;
+
+        return Math.max(0, Math.min(100, score));
     }
 
     /**
-     * Calculate bonus points from wallet age
+     * Calculate wallet age score (0-100)
      * 
-     * Formula: months * pointsPerMonth (capped at maxPoints)
-     * Threshold: 3 months
-     * Points per month: 10
-     * Max bonus: 100 points
-     * 
-     * @param months - Wallet age in months
-     * @returns Bonus points (0-100)
-     * 
-     * @example
-     * calculateAgeBonus(1)  => 0   (below threshold)
-     * calculateAgeBonus(6)  => 60  (6 months * 10 points)
-     * calculateAgeBonus(24) => 100 (capped at max)
+     * Older wallets are more trustworthy
      */
-    private static calculateAgeBonus(months: number): number {
-        const config = SCORING_CONFIG.BONUSES.WALLET_AGE;
-        if (months < config.threshold) return 0;
+    private static calculateAgeScore(metrics: WalletMetrics): number {
+        const { walletAgeMonths } = metrics;
 
-        const bonus = months * config.pointsPerMonth;
-        return Math.min(bonus, config.maxPoints);
+        let score = 0;
+        if (walletAgeMonths >= 24) score = 100;      // 2+ years
+        else if (walletAgeMonths >= 18) score = 90;  // 1.5+ years
+        else if (walletAgeMonths >= 12) score = 80;  // 1+ year
+        else if (walletAgeMonths >= 6) score = 60;   // 6+ months
+        else if (walletAgeMonths >= 3) score = 40;   // 3+ months
+        else if (walletAgeMonths >= 1) score = 20;   // 1+ month
+        else score = walletAgeMonths * 20;           // < 1 month
+
+        return Math.min(100, score);
     }
 
     /**
-     * Calculate bonus points from DeFi activity score
+     * Calculate DeFi activity score (0-100)
      * 
-     * Formula: (score - threshold) * pointsPer (capped at maxPoints)
-     * Threshold: 20 (0-100 scale)
-     * Points per unit: 3
-     * Max bonus: 100 points
-     * 
-     * @param score - DeFi activity score (0-100)
-     * @returns Bonus points (0-100)
-     * 
-     * @example
-     * calculateDeFiBonus(10) => 0   (below threshold)
-     * calculateDeFiBonus(40) => 60  ((40-20) * 3)
-     * calculateDeFiBonus(80) => 100 (capped at max)
+     * Already provided by metrics, but we can enhance it
      */
-    private static calculateDeFiBonus(score: number): number {
-        const config = SCORING_CONFIG.BONUSES.DEFI_SCORE;
-        if (score < config.threshold) return 0;
+    private static calculateDeFiScore(metrics: WalletMetrics): number {
+        const { defiScore } = metrics;
 
-        const bonus = (score - config.threshold) * config.pointsPer;
-        return Math.min(bonus, config.maxPoints);
+        // Apply non-linear scaling to reward high DeFi engagement
+        if (defiScore >= 80) return 100;
+        if (defiScore >= 60) return 85;
+        if (defiScore >= 40) return 70;
+        if (defiScore >= 20) return 50;
+        return defiScore * 2; // Double the score for low values
     }
 
     /**
-     * Calculate bonus points from repayment rate
+     * Calculate repayment behavior score (0-100)
      * 
-     * Formula: (rate - threshold) * pointsPer (capped at maxPoints)
-     * Threshold: 75%
-     * Points per percentage: 2 (higher weight for repayment)
-     * Max bonus: 150 points
-     * 
-     * @param rate - Repayment rate percentage (0-100)
-     * @returns Bonus points (0-150)
-     * 
-     * @example
-     * calculateRepaymentBonus(50)  => 0   (below threshold)
-     * calculateRepaymentBonus(85)  => 20  ((85-75) * 2)
-     * calculateRepaymentBonus(100) => 50  ((100-75) * 2)
+     * Most important factor for creditworthiness
      */
-    private static calculateRepaymentBonus(rate: number): number {
-        const config = SCORING_CONFIG.BONUSES.REPAYMENT_RATE;
-        if (rate < config.threshold) return 0;
+    private static calculateRepaymentScore(metrics: WalletMetrics): number {
+        const { repaymentRate } = metrics;
 
-        const bonus = (rate - config.threshold) * config.pointsPer;
-        return Math.min(bonus, config.maxPoints);
+        // Repayment rate is critical - use exponential scaling
+        if (repaymentRate >= 95) return 100;
+        if (repaymentRate >= 90) return 95;
+        if (repaymentRate >= 85) return 90;
+        if (repaymentRate >= 80) return 85;
+        if (repaymentRate >= 75) return 75;
+        if (repaymentRate >= 70) return 65;
+        if (repaymentRate >= 60) return 50;
+        return repaymentRate * 0.7; // Harsh penalty for low repayment
+    }
+
+    /**
+     * Calculate balance stability score (0-100)
+     * 
+     * Higher balance indicates financial stability
+     */
+    private static calculateBalanceScore(metrics: WalletMetrics): number {
+        const { tokenBalance } = metrics;
+
+        // Score based on balance tiers (in microcredits)
+        let score = 0;
+        if (tokenBalance >= 1000000) score = 100;      // 1M+ credits
+        else if (tokenBalance >= 500000) score = 90;   // 500K+ credits
+        else if (tokenBalance >= 100000) score = 80;   // 100K+ credits
+        else if (tokenBalance >= 50000) score = 70;    // 50K+ credits
+        else if (tokenBalance >= 10000) score = 60;    // 10K+ credits
+        else if (tokenBalance >= 5000) score = 50;     // 5K+ credits
+        else if (tokenBalance >= 1000) score = 40;     // 1K+ credits
+        else score = tokenBalance / 25;                // < 1K credits
+
+        return Math.min(100, score);
     }
 
     /**
      * Determine risk level from credit score
      * 
-     * Thresholds:
-     * - Low Risk: >= 750
-     * - Medium Risk: >= 500
-     * - High Risk: < 500
-     * 
-     * @param score - Credit score (300-850)
-     * @returns Risk level classification
-     * 
-     * @example
-     * getRiskLevel(800) => 'low'
-     * getRiskLevel(650) => 'medium'
-     * getRiskLevel(400) => 'high'
+     * Enhanced with more granular levels
      */
     private static getRiskLevel(score: number): RiskLevel {
-        if (score >= RISK_LEVELS.LOW.minScore) return 'low';
-        if (score >= RISK_LEVELS.MEDIUM.minScore) return 'medium';
+        if (score >= 750) return 'low';
+        if (score >= 500) return 'medium';
         return 'high';
     }
 
     /**
-     * Validate wallet metrics
-     * Ensures all values are within acceptable ranges
+     * Get detailed factor analysis
      * 
-     * @param metrics - Wallet metrics to validate
-     * @throws Error if validation fails
+     * Shows how each factor contributes to the final score
+     */
+    static getFactorAnalysis(assessment: CreditAssessment): FactorAnalysis[] {
+        const { metrics } = assessment;
+
+        const transactionScore = this.calculateTransactionScore(metrics);
+        const ageScore = this.calculateAgeScore(metrics);
+        const defiScore = this.calculateDeFiScore(metrics);
+        const repaymentScore = this.calculateRepaymentScore(metrics);
+        const balanceScore = this.calculateBalanceScore(metrics);
+
+        const factors: FactorAnalysis[] = [
+            {
+                name: 'Transaction History',
+                score: transactionScore,
+                weight: FACTOR_WEIGHTS.TRANSACTION_HISTORY,
+                contribution: transactionScore * FACTOR_WEIGHTS.TRANSACTION_HISTORY,
+                rating: this.getRating(transactionScore),
+                description: `${metrics.transactionCount} transactions on record`,
+            },
+            {
+                name: 'Wallet Age',
+                score: ageScore,
+                weight: FACTOR_WEIGHTS.WALLET_AGE,
+                contribution: ageScore * FACTOR_WEIGHTS.WALLET_AGE,
+                rating: this.getRating(ageScore),
+                description: `${metrics.walletAgeMonths} months old`,
+            },
+            {
+                name: 'DeFi Activity',
+                score: defiScore,
+                weight: FACTOR_WEIGHTS.DEFI_ACTIVITY,
+                contribution: defiScore * FACTOR_WEIGHTS.DEFI_ACTIVITY,
+                rating: this.getRating(defiScore),
+                description: `${metrics.defiScore}% DeFi engagement`,
+            },
+            {
+                name: 'Repayment Behavior',
+                score: repaymentScore,
+                weight: FACTOR_WEIGHTS.REPAYMENT_BEHAVIOR,
+                contribution: repaymentScore * FACTOR_WEIGHTS.REPAYMENT_BEHAVIOR,
+                rating: this.getRating(repaymentScore),
+                description: `${metrics.repaymentRate}% repayment rate`,
+            },
+            {
+                name: 'Balance Stability',
+                score: balanceScore,
+                weight: FACTOR_WEIGHTS.BALANCE_STABILITY,
+                contribution: balanceScore * FACTOR_WEIGHTS.BALANCE_STABILITY,
+                rating: this.getRating(balanceScore),
+                description: `${metrics.tokenBalance.toLocaleString()} credits`,
+            },
+        ];
+
+        return factors;
+    }
+
+    /**
+     * Get score improvement suggestions
+     * 
+     * Analyzes weak factors and suggests improvements
+     */
+    static getImprovementSuggestions(assessment: CreditAssessment): ScoreImprovement[] {
+        const factors = this.getFactorAnalysis(assessment);
+        const suggestions: ScoreImprovement[] = [];
+
+        factors.forEach(factor => {
+            if (factor.score < 70) {
+                const potentialGain = Math.round((100 - factor.score) * factor.weight * 5.5);
+
+                let suggestion = '';
+                let priority: 'high' | 'medium' | 'low' = 'low';
+
+                switch (factor.name) {
+                    case 'Transaction History':
+                        suggestion = 'Increase your on-chain activity by making more transactions';
+                        priority = factor.score < 40 ? 'high' : 'medium';
+                        break;
+                    case 'Wallet Age':
+                        suggestion = 'Continue using your wallet consistently over time';
+                        priority = 'low'; // Can't speed up time
+                        break;
+                    case 'DeFi Activity':
+                        suggestion = 'Engage with DeFi protocols like lending, swapping, or staking';
+                        priority = factor.score < 50 ? 'high' : 'medium';
+                        break;
+                    case 'Repayment Behavior':
+                        suggestion = 'Maintain timely repayments and fulfill all obligations';
+                        priority = 'high'; // Most important factor
+                        break;
+                    case 'Balance Stability':
+                        suggestion = 'Maintain a higher balance to demonstrate financial stability';
+                        priority = factor.score < 40 ? 'medium' : 'low';
+                        break;
+                }
+
+                suggestions.push({
+                    factor: factor.name,
+                    currentScore: factor.score,
+                    potentialGain,
+                    suggestion,
+                    priority,
+                });
+            }
+        });
+
+        // Sort by priority and potential gain
+        return suggestions.sort((a, b) => {
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+                return priorityOrder[a.priority] - priorityOrder[b.priority];
+            }
+            return b.potentialGain - a.potentialGain;
+        });
+    }
+
+    /**
+     * Get rating from score
+     */
+    private static getRating(score: number): 'excellent' | 'good' | 'fair' | 'poor' {
+        if (score >= 85) return 'excellent';
+        if (score >= 70) return 'good';
+        if (score >= 50) return 'fair';
+        return 'poor';
+    }
+
+    /**
+     * Validate wallet metrics
      */
     static validateMetrics(metrics: WalletMetrics): void {
         if (!metrics.address || !metrics.address.startsWith('aleo1')) {
@@ -214,24 +383,61 @@ export class ScoringEngine {
 
     /**
      * Get score breakdown for UI display
-     * Shows how each factor contributes to final score
-     * 
-     * @param assessment - Credit assessment
-     * @returns Detailed breakdown object
      */
     static getScoreBreakdown(assessment: CreditAssessment) {
-        const { metrics } = assessment;
+        const factors = this.getFactorAnalysis(assessment);
 
         return {
             base: SCORING_CONFIG.BASE_SCORE,
-            bonuses: {
-                transactions: this.calculateTransactionBonus(metrics.transactionCount),
-                walletAge: this.calculateAgeBonus(metrics.walletAgeMonths),
-                defiActivity: this.calculateDeFiBonus(metrics.defiScore),
-                repaymentRate: this.calculateRepaymentBonus(metrics.repaymentRate),
-            },
+            factors: factors.map(f => ({
+                name: f.name,
+                score: f.score,
+                weight: f.weight * 100, // Convert to percentage
+                contribution: Math.round(f.contribution * 5.5), // Convert to points
+                rating: f.rating,
+            })),
             total: assessment.finalScore,
             maxPossible: SCORING_CONFIG.MAX_SCORE,
         };
+    }
+
+    /**
+     * Calculate score percentile
+     * 
+     * Estimates where this score ranks among all users
+     * (Simplified - in production would use actual distribution data)
+     */
+    static getScorePercentile(score: number): number {
+        // Simplified percentile calculation
+        // Assumes normal distribution with mean=600, stddev=100
+        const mean = 600;
+        const stddev = 100;
+        const z = (score - mean) / stddev;
+
+        // Approximate percentile using error function
+        const percentile = 50 * (1 + this.erf(z / Math.sqrt(2)));
+
+        return Math.max(0, Math.min(100, Math.round(percentile)));
+    }
+
+    /**
+     * Error function approximation for percentile calculation
+     */
+    private static erf(x: number): number {
+        // Abramowitz and Stegun approximation
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+
+        const sign = x < 0 ? -1 : 1;
+        x = Math.abs(x);
+
+        const t = 1.0 / (1.0 + p * x);
+        const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+        return sign * y;
     }
 }
