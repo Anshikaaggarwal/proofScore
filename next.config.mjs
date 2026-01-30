@@ -26,14 +26,8 @@ const nextConfig = {
   },
 
   // Turbopack configuration (Next.js 16+)
-  turbopack: {
-    resolveAlias: {
-      // Handle node modules for Web3 libraries in Turbopack
-      fs: false,
-      net: false,
-      tls: false,
-    },
-  },
+  // Empty config to acknowledge we're using Turbopack
+  turbopack: {},
 
   // Security headers
   async headers() {
