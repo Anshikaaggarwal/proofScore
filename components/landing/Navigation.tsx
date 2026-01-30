@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Wallet, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { useWallet, useFormattedAddress } from '@/lib/providers/WalletProvider';
 
 export function Navigation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isConnected, setIsConnected] = useState(false);
+    const { address, isConnected, isConnecting, connect, disconnect } = useWallet();
+    const formattedAddress = useFormattedAddress(address);
 
     const navLinks = [
         { href: '#features', label: 'Features' },
@@ -16,9 +18,12 @@ export function Navigation() {
         { href: 'https://github.com/proofscore', label: 'GitHub', external: true },
     ];
 
-    const handleConnectWallet = () => {
-        // TODO: Implement wallet connection in Stage 6
-        setIsConnected(!isConnected);
+    const handleWalletAction = () => {
+        if (isConnected) {
+            disconnect();
+        } else {
+            connect();
+        }
     };
 
     return (
@@ -60,17 +65,19 @@ export function Navigation() {
                         {/* Desktop CTA */}
                         <div className="hidden md:flex items-center gap-4">
                             <button
-                                onClick={handleConnectWallet}
+                                onClick={handleWalletAction}
+                                disabled={isConnecting}
                                 className={`
                   px-6 py-2.5 rounded-lg font-medium text-sm transition-all flex items-center gap-2
                   ${isConnected
                                         ? 'bg-neon-green/10 border border-neon-green/30 text-neon-green'
                                         : 'btn-primary'
                                     }
+                  ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
                             >
                                 <Wallet className="w-4 h-4" />
-                                {isConnected ? 'aleo1...xyz' : 'Connect Wallet'}
+                                {isConnecting ? 'Connecting...' : isConnected ? formattedAddress : 'Connect Wallet'}
                             </button>
                         </div>
 
@@ -117,19 +124,21 @@ export function Navigation() {
                             <div className="pt-4 border-t border-glass-border">
                                 <button
                                     onClick={() => {
-                                        handleConnectWallet();
+                                        handleWalletAction();
                                         setMobileMenuOpen(false);
                                     }}
+                                    disabled={isConnecting}
                                     className={`
                     w-full px-6 py-3 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2
                     ${isConnected
                                             ? 'bg-neon-green/10 border border-neon-green/30 text-neon-green'
                                             : 'btn-primary'
                                         }
+                    ${isConnecting ? 'opacity-50 cursor-not-allowed' : ''}
                   `}
                                 >
                                     <Wallet className="w-4 h-4" />
-                                    {isConnected ? 'aleo1...xyz' : 'Connect Wallet'}
+                                    {isConnecting ? 'Connecting...' : isConnected ? formattedAddress : 'Connect Wallet'}
                                 </button>
                             </div>
                         </div>

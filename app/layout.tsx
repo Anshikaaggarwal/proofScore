@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import { WalletProvider } from '@/lib/providers/WalletProvider';
 import './globals.css';
 
 // Primary font: Inter (modern, clean, professional)
@@ -94,10 +95,13 @@ export default function RootLayout({
         {/* Noise overlay for texture */}
         <div className="noise-overlay" />
 
-        {/* Main content */}
-        <main className="relative min-h-screen">
-          {children}
-        </main>
+        {/* Global Providers */}
+        <WalletProvider>
+          {/* Main content */}
+          <main className="relative min-h-screen">
+            {children}
+          </main>
+        </WalletProvider>
 
         {/* Analytics */}
         <Analytics />
