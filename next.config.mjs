@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   poweredByHeader: false,
 
   // TypeScript: Allow build with warnings for now
@@ -9,17 +8,31 @@ const nextConfig = {
     ignoreBuildErrors: true, // TODO: Fix type errors before production
   },
 
-  // ESLint: Allow build with warnings
-  eslint: {
-    ignoreDuringBuilds: true, // TODO: Fix lint errors before production
-  },
-
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['explorer.aleo.org', 'api.explorer.aleo.org'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'explorer.aleo.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.explorer.aleo.org',
+      },
+    ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {
+    resolveAlias: {
+      // Handle node modules for Web3 libraries in Turbopack
+      fs: false,
+      net: false,
+      tls: false,
+    },
   },
 
   // Security headers
@@ -71,21 +84,6 @@ const nextConfig = {
         ],
       },
     ];
-  },
-
-  // Webpack configuration
-  webpack: (config, { isServer }) => {
-    // Handle node modules for Web3 libraries
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-
-    return config;
   },
 
   // Experimental features
